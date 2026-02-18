@@ -1,17 +1,18 @@
-from django.shortcuts import render
-from django.http import JsonResponse
+from rest_framework.response import Response
+from rest_framework.decorators import api_view
+from .models import Product, Category
+from .serializers import ProductSerializers, CategorySerializer
 
 
-def home(request):
+@api_view(['GET'])
+def get_products(request):
+    products = Product.objects.all()
+    serializer = ProductSerializers(products, many=True)
+    return Response(serializer.data)
 
-   data ={
-    'message':'Welcome to E-commerce Store'
-}
-   return JsonResponse(data)
 
-def hello(request):
-   data={
-      'message':'hello vishal i am new message'
-   }
-
-   return JsonResponse(data)
+@api_view(['GET'])
+def get_categories(request):
+    categories = Category.objects.all()
+    serializer = CategorySerializer(categories, many=True)
+    return Response(serializer.data)
