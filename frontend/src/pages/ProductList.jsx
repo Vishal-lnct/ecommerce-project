@@ -14,32 +14,30 @@ function ProductList() {
     const BASEURL = import.meta.env.VITE_DJANGO_BASE_URL;
 
     useEffect(() => {
-        setLoading(true);
-        setError(null);
+    setLoading(true);
+    setError(null);
 
-        let url = `${BASEURL}/api/products/`;
+    let url = `${BASEURL}/api/products/`;
 
-        if (search) {
-            url += `?search=${search}`;
-        }
+    if (search && search.trim() !== "") {
+        url += `?search=${search}`;
+    }
 
-        fetch(url)
-            .then((response) => {
-                if (!response.ok) {
-                    throw new Error("Failed to fetch products");
-                }
-                return response.json();
-            })
-            .then((data) => {
-                setProducts(data);
-                setLoading(false);
-            })
-            .catch((error) => {
-                setError(error.message);
-                setLoading(false);
-            });
+    fetch(url)
+        .then(res => {
+            if (!res.ok) throw new Error("Failed to fetch products");
+            return res.json();
+        })
+        .then(data => {
+            setProducts(data);
+            setLoading(false);
+        })
+        .catch(err => {
+            setError(err.message);
+            setLoading(false);
+        });
 
-    }, [search]); // 🔥 important dependency
+}, [search]);// 🔥 important dependency
 
     if (loading) {
         return (
