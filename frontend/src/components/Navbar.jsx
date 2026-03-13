@@ -45,21 +45,28 @@ function Navbar() {
   // ======================
   // SEARCH DEBOUNCE
   // ======================
-  useEffect(() => {
+useEffect(() => {
 
-    if (!search.trim()) return;
+  const debounce = setTimeout(() => {
 
-    const debounce = setTimeout(() => {
+    const query = search.trim();
 
-      const query = search.trim();
+    const params = new URLSearchParams(location.search);
+    const currentSearch = params.get("search") || "";
 
+    if (query === "" && currentSearch !== "") {
+      navigate("/");
+    }
+
+    if (query !== "" && query !== currentSearch) {
       navigate(`/?search=${encodeURIComponent(query)}`);
+    }
 
-    }, 400);
+  }, 400);
 
-    return () => clearTimeout(debounce);
+  return () => clearTimeout(debounce);
 
-  }, [search, navigate]);
+}, [search, location.search, navigate]);
 
   // ======================
   // CART COUNT

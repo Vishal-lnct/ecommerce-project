@@ -4,107 +4,86 @@ import { useWishlist } from "../context/WishlistContext";
 
 function Wishlist() {
 
-  const BASEURL = import.meta.env.VITE_DJANGO_BASE_URL;
   const navigate = useNavigate();
 
-  const { wishlistItems, setWishlistItems, fetchWishlist } = useWishlist();
+  const { wishlistItems, fetchWishlist, removeFromWishlist } = useWishlist();
 
-  // ======================
-  // FETCH WISHLIST ON LOAD
-  // ======================
   useEffect(() => {
 
-    const token = localStorage.getItem("access_token");
+    // const token = localStorage.getItem("access_token");
 
-    if (!token) {
-      navigate("/login");
-      return;
-    }
+    // if (!token) {
+    //   navigate("/login");
+    //   return;
+    // }
 
     fetchWishlist();
 
-  }, [navigate, fetchWishlist]);
-
-
-  // ======================
-  // REMOVE PRODUCT
-  // ======================
-  const removeFromWishlist = async (productId) => {
-
-    const token = localStorage.getItem("access_token");
-
-    try {
-
-      const res = await fetch(`${BASEURL}/api/wishlist/remove/${productId}/`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
-
-      if (!res.ok) {
-        throw new Error("Failed to remove product");
-      }
-
-      // Update UI instantly
-      setWishlistItems(prev =>
-        prev.filter(item => item.product.id !== productId)
-      );
-
-      // Sync context count (Navbar)
-      fetchWishlist();
-
-    } catch (error) {
-      console.error("Remove wishlist error:", error);
-    }
-  };
+  }, [navigate]);
 
 
   return (
-    <div className="p-10">
+    <div className="min-h-screen bg-gray-100 py-12 px-6">
 
-      <h1 className="text-3xl font-bold mb-6">
-        ❤️ My Wishlist
-      </h1>
+      <div className="max-w-7xl mx-auto">
 
-      {wishlistItems.length === 0 ? (
-        <p>No products in wishlist</p>
-      ) : (
+        <h1 className="text-3xl font-bold mb-10">
+          ❤️ My Wishlist
+        </h1>
 
-        <div className="grid grid-cols-3 gap-6">
+        {wishlistItems.length === 0 ? (
 
-          {wishlistItems.map((item) => (
+          <p className="text-gray-500">No products in wishlist</p>
 
-            <div key={item.id} className="border p-4 rounded-lg">
+        ) : (
 
-              <img
-                src={item.product.image}
-                alt={item.product.name}
-                className="h-40 object-cover"
-              />
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
 
-              <h2 className="text-lg font-semibold mt-2">
-                {item.product.name}
-              </h2>
+            {wishlistItems.map((item) => (
 
-              <p className="text-green-600">
-                ₹{item.product.price}
-              </p>
-
-              <button
-                onClick={() => removeFromWishlist(item.product.id)}
-                className="mt-3 bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
+              <div
+                key={item.id}
+                className="bg-white rounded-xl shadow-md hover:shadow-xl transition duration-300 p-4"
               >
-                Remove
-              </button>
 
-            </div>
+                {/* IMAGE */}
+                <div className="overflow-hidden rounded-lg">
 
-          ))}
+                  <img
+                    src={item.product.image}
+                    alt={item.product.name}
+                    className="w-full h-44 object-cover transition-transform duration-300 hover:scale-105"
+                  />
 
-        </div>
+                </div>
 
-      )}
+                {/* NAME */}
+                <h2 className="text-md font-semibold text-gray-800 mt-3 line-clamp-1">
+                  {item.product.name}
+                </h2>
+
+                {/* PRICE */}
+                <p className="text-green-600 font-bold mt-1">
+                  ₹{item.product.price}
+                </p>
+
+                {/* REMOVE BUTTON */}
+                <button
+                  onClick={() => removeFromWishlist(item.product.id)}
+                  className="mt-3 w-full bg-red-500 hover:bg-red-600 text-white py-2 rounded-lg text-sm font-medium transition"
+                >
+                  Remove
+                </button>
+
+              </div>
+
+            ))}
+
+          </div>
+
+        )}
+
+      </div>
 
     </div>
   );

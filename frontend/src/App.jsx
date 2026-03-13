@@ -1,3 +1,4 @@
+
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 
 import ProductList from "./pages/ProductList";
@@ -7,8 +8,7 @@ import CartPage from "./pages/CartPage";
 import CheckoutPage from "./pages/CheckoutPage";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
-
-import PrivateRouter from "./components/PrivateRouter";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 import Profile from "./pages/Profile";
 import Orders from "./pages/Orders";
@@ -31,15 +31,43 @@ function App() {
         <Route path="/signup" element={<Signup />} />
 
         {/* ===== PROTECTED ROUTES ===== */}
-        <Route element={<PrivateRouter />}>
-        <Route path="/" element={<Home />} />
-          <Route path="/checkout" element={<CheckoutPage />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/orders" element={<Orders />} />
-          <Route path="/wishlist" element={<Wishlist />} />
-        </Route>
+        <Route
+          path="/checkout"
+          element={
+            <ProtectedRoute>
+              <CheckoutPage />
+            </ProtectedRoute>
+          }
+        />
 
-        {/* ===== PUBLIC OPTIONAL PAGES ===== */}
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <Profile />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/orders"
+          element={
+            <ProtectedRoute>
+              <Orders />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/wishlist"
+          element={
+            <ProtectedRoute>
+              <Wishlist />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* ===== OPTIONAL PUBLIC PAGES ===== */}
         <Route path="/seller" element={<Seller />} />
         <Route path="/support" element={<Support />} />
       </Routes>
@@ -48,3 +76,4 @@ function App() {
 }
 
 export default App;
+

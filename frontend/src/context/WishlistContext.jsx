@@ -37,6 +37,65 @@ export const WishlistProvider = ({ children }) => {
 
   }, [BASEURL]);
 
+
+  // ======================
+  // ADD TO WISHLIST
+  // ======================
+  const addToWishlist = async (productId) => {
+
+    const token = localStorage.getItem("access_token");
+
+    if (!token) return;
+
+    try {
+
+      await fetch(`${BASEURL}/api/wishlist/add/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          product_id: productId
+        })
+      });
+
+      fetchWishlist(); // refresh state
+
+    } catch (error) {
+      console.error("Add wishlist error:", error);
+    }
+
+  };
+
+
+  // ======================
+  // REMOVE FROM WISHLIST
+  // ======================
+  const removeFromWishlist = async (productId) => {
+
+    const token = localStorage.getItem("access_token");
+
+    if (!token) return;
+
+    try {
+
+      await fetch(`${BASEURL}/api/wishlist/remove/${productId}/`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+
+      fetchWishlist(); // refresh state
+
+    } catch (error) {
+      console.error("Remove wishlist error:", error);
+    }
+
+  };
+
+
   // ======================
   // LOAD ON APP START
   // ======================
@@ -44,12 +103,14 @@ export const WishlistProvider = ({ children }) => {
     fetchWishlist();
   }, [fetchWishlist]);
 
+
   return (
     <WishlistContext.Provider
       value={{
         wishlistItems,
-        setWishlistItems,
-        fetchWishlist
+        fetchWishlist,
+        addToWishlist,
+        removeFromWishlist
       }}
     >
       {children}

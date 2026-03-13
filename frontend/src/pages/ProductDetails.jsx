@@ -1,6 +1,7 @@
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useCart } from "../context/CartContext";
+import { useWishlist } from "../context/WishlistContext";
 
 function ProductDetails() {
 
@@ -11,11 +12,13 @@ function ProductDetails() {
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [isWishlisted, setIsWishlisted] = useState(false);
 
   const { addToCart } = useCart();
+  const { addToWishlist, removeFromWishlist, wishlistItems } = useWishlist();
 
-  // Fetch product
+  const [isWishlisted, setIsWishlisted] = useState(false);
+
+
   useEffect(() => {
 
     fetch(`${BASEURL}/api/products/${id}/`)
@@ -37,35 +40,15 @@ function ProductDetails() {
   }, [id, BASEURL]);
 
 
-  // Check if product already in wishlist
   useEffect(() => {
 
-    const token = localStorage.getItem("access_token");
+    const exists = wishlistItems.some(
+      item => item.product.id === Number(id)
+    );
 
-    if (!token) return;
+    setIsWishlisted(exists);
 
-    fetch(`${BASEURL}/api/wishlist/`, {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    })
-      .then(res => res.json())
-      .then(data => {
-
-        const exists = data.some(
-          item => item.product.id === Number(id)
-        );
-
-        setIsWishlisted(exists);
-
-      });
-
-  }, [id, BASEURL]);
-
-
-  if (loading) return <div className="text-center mt-10">Loading...</div>;
-  if (error) return <div className="text-center mt-10 text-red-500">Error: {error}</div>;
-  if (!product) return <div className="text-center mt-10">No product found</div>;
+  }, [wishlistItems, id]);
 
 
   const handleAddToCart = () => {
@@ -81,7 +64,6 @@ function ProductDetails() {
   };
 
 
-  // Toggle Wishlist
   const toggleWishlist = async () => {
 
     const token = localStorage.getItem("access_token");
@@ -91,93 +73,83 @@ function ProductDetails() {
       return;
     }
 
-    try {
-
-      if (isWishlisted) {
-
-        // REMOVE
-        await fetch(`${BASEURL}/api/wishlist/remove/${product.id}/`, {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        });
-
-        setIsWishlisted(false);
-
-      } else {
-
-        // ADD
-        await fetch(`${BASEURL}/api/wishlist/add/`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`
-          },
-          body: JSON.stringify({
-            product_id: product.id
-          })
-        });
-
-        setIsWishlisted(true);
-      }
-
-    } catch (error) {
-      console.error("Wishlist toggle error:", error);
+    if (isWishlisted) {
+      await removeFromWishlist(product.id);
+    } else {
+      await addToWishlist(product.id);
     }
 
   };
 
 
+  if (loading) return <div className="text-center mt-10 text-lg">Loading...</div>;
+  if (error) return <div className="text-center mt-10 text-red-500">Error: {error}</div>;
+  if (!product) return <div className="text-center mt-10">No product found</div>;
+
+
   return (
-    <div className="min-h-screen bg-gray-100 flex justify-center items-center py-10">
+    <div className="min-h-screen bg-gray-100 flex justify-center items-center py-16 px-6">
 
-      <div className="bg-white shadow-lg rounded-2xl p-8 max-w-3xl w-full">
+      <div className="bg-white shadow-xl rounded-3xl p-10 max-w-5xl w-full">
 
-        <div className="flex flex-col md:flex-row gap-8">
+        <div className="grid md:grid-cols-2 gap-12 items-center">
 
-          <img
-            src={product.image}
-            alt={product.name}
-            className="w-full md:w-1/2 h-auto object-cover rounded-lg"
-          />
+          {/* PRODUCT IMAGE */}
+          <div className="overflow-hidden rounded-2xl shadow-md group">
 
-          <div className="flex-1">
+            <img
+              src={product.image}
+              alt={product.name}
+              className="w-full h-[420px] object-cover transition-transform duration-300 group-hover:scale-105"
+            />
 
-            <h1 className="text-3xl font-bold text-gray-800 mb-2">
+          </div>
+
+
+          {/* PRODUCT DETAILS */}
+          <div>
+
+            <h1 className="text-4xl font-bold text-gray-800 mb-4">
               {product.name}
             </h1>
 
-            <p className="text-gray-600 mb-4">
+            <p className="text-gray-500 text-lg mb-6 leading-relaxed">
               {product.description}
             </p>
 
-            <p className="text-2xl font-semibold text-green-600 mb-6">
+            <p className="text-3xl font-bold text-green-600 mb-8">
               ₹{product.price}
             </p>
 
-            <div className="flex gap-4">
+            <div className="flex flex-wrap gap-4">
 
+              {/* ADD TO CART */}
               <button
                 onClick={handleAddToCart}
-                className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition"
+                className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-xl font-semibold shadow-md transition"
               >
                 Add to Cart 🛒
               </button>
 
+              {/* WISHLIST BUTTON */}
               <button
                 onClick={toggleWishlist}
-                className="bg-pink-500 text-white px-6 py-2 rounded-lg hover:bg-pink-600 transition"
+                className={`px-8 py-3 rounded-xl font-semibold shadow-md transition ${
+                  isWishlisted
+                    ? "bg-pink-500 hover:bg-pink-600 text-white"
+                    : "bg-gray-200 hover:bg-gray-300 text-gray-800"
+                }`}
               >
                 {isWishlisted ? "❤️ Wishlisted" : "🤍 Add to Wishlist"}
               </button>
 
             </div>
 
-            <div className="mt-4">
+            {/* BACK LINK */}
+            <div className="mt-8">
               <Link
                 to="/"
-                className="text-blue-600 hover:underline"
+                className="text-blue-600 font-medium hover:underline"
               >
                 ← Back to Home
               </Link>

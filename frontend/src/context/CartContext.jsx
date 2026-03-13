@@ -1,3 +1,4 @@
+
 import { createContext, useContext, useState, useEffect } from "react";
 import { authFetch, getAccessToken } from "../utils/auth";
 
@@ -14,8 +15,15 @@ export const CartProvider = ({ children }) => {
   // Fetch Cart From Backend
   // =========================
   const fetchCart = async () => {
+    if (!token) return; // 🟢 prevent API call if not logged in
+
     try {
       const res = await authFetch(`${BASEURL}/api/cart/`);
+
+      if (!res.ok) {
+        throw new Error("Failed to fetch cart");
+      }
+
       const data = await res.json();
 
       setCartItems(data.items || []);
@@ -102,29 +110,30 @@ export const CartProvider = ({ children }) => {
   };
 
   // =========================
-  // Refresh Auth (Login/Logout Trigger)
+  // Refresh Auth (Login/Logout)
   // =========================
   const refreshCartAuth = () => {
     setToken(getAccessToken());
   };
 
   return (
-   <CartContext.Provider
-  value={{
-    cartItems,
-    total,
-    token,              // ✅ ADD THIS
-    addToCart,
-    removeFromCart,
-    updateQuantity,
-    clearCart,
-    fetchCart,
-    refreshCartAuth,
-  }}
->
+    <CartContext.Provider
+      value={{
+        cartItems,
+        total,
+        token,
+        addToCart,
+        removeFromCart,
+        updateQuantity,
+        clearCart,
+        fetchCart,
+        refreshCartAuth,
+      }}
+    >
       {children}
     </CartContext.Provider>
   );
 };
 
 export const useCart = () => useContext(CartContext);
+
