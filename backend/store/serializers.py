@@ -6,7 +6,8 @@ from .models import (
     CartItem,
     Order,
     OrderItem,
-    Wishlist
+    Wishlist,
+    Address
 )
 from django.contrib.auth.models import User
 
@@ -131,3 +132,16 @@ class WishlistSerializer(serializers.ModelSerializer):
     class Meta:
         model = Wishlist
         fields = "__all__"
+
+
+
+##address ka
+from rest_framework import serializers
+from .models import Address
+
+class AddressSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Address
+        fields = "__all__"
+        read_only_fields = ["user"]        

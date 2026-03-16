@@ -4,7 +4,7 @@ from .views import get_orders
 from .views import cancel_order
 from .views import add_to_wishlist, get_wishlist, remove_from_wishlist
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
-
+from .views import AddressListCreateView
 urlpatterns = [
 
     # AUTH
@@ -34,6 +34,9 @@ urlpatterns = [
 #my order me dikhane ke lie
     path('orders/', get_orders),
 
+##address ak
+
+ path("addresses/", AddressListCreateView.as_view(), name="addresses"),
 
     #wishlist me add ,delete aur dekhne ke lie
 

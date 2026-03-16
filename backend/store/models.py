@@ -112,7 +112,7 @@ class CartItem(models.Model):
     
 
 
-  # ---------------- WISHLIST ----------------
+  #wishlist ka code
 class Wishlist(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="wishlist")
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
@@ -124,3 +124,24 @@ class Wishlist(models.Model):
     def __str__(self):
         return f"{self.user.username} ❤️ {self.product.name}"
                    
+##address ka model
+class Address(models.Model):
+
+    user = models.ForeignKey(User,on_delete=models.CASCADE)
+
+    name = models.CharField(max_length=100)
+    phone = models.CharField(max_length=15)
+
+    pincode = models.CharField(max_length=10)
+    city = models.CharField(max_length=100)
+    state = models.CharField(max_length=100)
+
+    house = models.CharField(max_length=200)
+    area = models.CharField(max_length=200)
+
+    address_type = models.CharField(max_length=10)  # home/work
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.name} - {self.city}"                   

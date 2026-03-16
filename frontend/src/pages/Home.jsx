@@ -5,9 +5,9 @@ function Home() {
   const [products, setProducts] = useState([]);
   const location = useLocation();
 
-  // ======================
+
   // READ URL PARAMS
-  // ======================
+  
   const params = new URLSearchParams(location.search);
   const search = params.get("search");
   const category = params.get("category");

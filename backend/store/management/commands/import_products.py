@@ -13,12 +13,12 @@ class Command(BaseCommand):
 
             for row in reader:
 
-                # ✅ Create or get category
+                #  Create or get category
                 category_obj, created = Category.objects.get_or_create(
                     name=row["category"]
                 )
 
-                # ✅ Create product
+                #  Create product
                 Product.objects.create(
                     name=row["name"],
                     description=row["description"],
@@ -28,5 +28,5 @@ class Command(BaseCommand):
                 )
 
         self.stdout.write(
-            self.style.SUCCESS("✅ Products Imported Successfully")
+            self.style.SUCCESS("Products Imported Successfully")
         )

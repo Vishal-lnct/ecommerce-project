@@ -1,4 +1,3 @@
-
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 
 import ProductList from "./pages/ProductList";
@@ -13,67 +12,68 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import Profile from "./pages/Profile";
 import Orders from "./pages/Orders";
 import Wishlist from "./pages/Wishlist";
-import Seller from "./pages/Seller";
+
 import Home from "./pages/Home";
-import Support from "./pages/Support";
+
+import { LocationProvider } from "./context/LocationContext";  // ✅ add this
+
 
 function App() {
   return (
-    <Router>
-      <Navbar />
+    <LocationProvider>   {/* ✅ wrap here */}
+      <Router>
+        <Navbar />
 
-      <Routes>
-        {/* ===== PUBLIC ROUTES ===== */}
-        <Route path="/" element={<ProductList />} />
-        <Route path="/product/:id" element={<ProductDetails />} />
-        <Route path="/cart" element={<CartPage />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
+        <Routes>
 
-        {/* ===== PROTECTED ROUTES ===== */}
-        <Route
-          path="/checkout"
-          element={
-            <ProtectedRoute>
-              <CheckoutPage />
-            </ProtectedRoute>
-          }
-        />
+          {/* ===== PUBLIC ROUTES ===== */}
+          <Route path="/" element={<ProductList />} />
+          <Route path="/product/:id" element={<ProductDetails />} />
+          <Route path="/cart" element={<CartPage />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
 
-        <Route
-          path="/profile"
-          element={
-            <ProtectedRoute>
-              <Profile />
-            </ProtectedRoute>
-          }
-        />
+          {/* ===== PROTECTED ROUTES ===== */}
+          <Route
+            path="/checkout"
+            element={
+              <ProtectedRoute>
+                <CheckoutPage />
+              </ProtectedRoute>
+            }
+          />
 
-        <Route
-          path="/orders"
-          element={
-            <ProtectedRoute>
-              <Orders />
-            </ProtectedRoute>
-          }
-        />
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <Profile />
+              </ProtectedRoute>
+            }
+          />
 
-        <Route
-          path="/wishlist"
-          element={
-            <ProtectedRoute>
-              <Wishlist />
-            </ProtectedRoute>
-          }
-        />
+          <Route
+            path="/orders"
+            element={
+              <ProtectedRoute>
+                <Orders />
+              </ProtectedRoute>
+            }
+          />
 
-        {/* ===== OPTIONAL PUBLIC PAGES ===== */}
-        <Route path="/seller" element={<Seller />} />
-        <Route path="/support" element={<Support />} />
-      </Routes>
-    </Router>
+          <Route
+            path="/wishlist"
+            element={
+              <ProtectedRoute>
+                <Wishlist />
+              </ProtectedRoute>
+            }
+          />
+
+        </Routes>
+      </Router>
+    </LocationProvider>
   );
 }
 
 export default App;
-
