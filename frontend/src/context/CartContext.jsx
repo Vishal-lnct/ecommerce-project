@@ -9,30 +9,53 @@ export const CartProvider = ({ children }) => {
 
   const [cartItems, setCartItems] = useState([]);
   const [total, setTotal] = useState(0);
-  const [token, setToken] = useState(getAccessToken());
+const [token, setToken] = useState(null);
 
+
+
+useEffect(() => {
+  const storedToken = getAccessToken();
+  if (storedToken) {
+    setToken(storedToken);
+  }
+}, []);
+
+useEffect(() => {
+  if (token) fetchCart();
+  else clearCart();
+}, [token]);
   // =========================
   // Fetch Cart From Backend
   // =========================
-  const fetchCart = async () => {
-    if (!token) return; // 🟢 prevent API call if not logged in
+const fetchCart = async () => {
+  if (!token) return;
 
-    try {
-      const res = await authFetch(`${BASEURL}/api/cart/`);
+  try {
+    const res = await authFetch(`${BASEURL}/api/cart/`);
 
-      if (!res.ok) {
-        throw new Error("Failed to fetch cart");
-      }
-
-      const data = await res.json();
-
-      setCartItems(data.items || []);
-      setTotal(data.total || 0);
-    } catch (error) {
-      console.error("Error fetching cart:", error);
+    if (res.status === 401) {
+      // 🔥 HANDLE INVALID TOKEN
+      localStorage.removeItem("access_token");
+      localStorage.removeItem("refresh_token");
+      setToken(null);
       clearCart();
+      return;
     }
-  };
+
+    if (!res.ok) {
+      throw new Error("Failed to fetch cart");
+    }
+
+    const data = await res.json();
+
+    setCartItems(data.items || []);
+    setTotal(data.total || 0);
+
+  } catch (error) {
+    console.error("Error fetching cart:", error);
+    clearCart();
+  }
+};
 
   // =========================
   // React To Login / Logout

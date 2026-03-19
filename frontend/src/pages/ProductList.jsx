@@ -70,7 +70,7 @@ const PRICE_OPTS = [
 ];
 
 const RATING_OPTS = [
-  { stars: "★★★★★", label: "5 stars", value: "5" },
+  { stars: "★★★★★", label: "5 stars",   value: "5" },
   { stars: "★★★★",  label: "4 & above", value: "4" },
   { stars: "★★★",   label: "3 & above", value: "3" },
 ];
@@ -83,116 +83,31 @@ const SORT_OPTS = [
   { label: "Top Rated",         value: "rating" },
 ];
 
-/* ─────────────────────────────────────────
-   STYLES
-───────────────────────────────────────── */
-const styles = `
+// Only keyframes that Tailwind can't express without custom config
+const keyframes = `
   @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Instrument+Serif:ital@0;1&display=swap');
 
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-  .pl-root {
-    min-height: 100vh;
-    background: #f7f7f5;
-    font-family: 'Syne', sans-serif;
-    color: #111;
+  @keyframes gridIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes skShimmer {
+    from { background-position: 200% 0; }
+    to   { background-position: -200% 0; }
   }
 
-  /* ── HERO ── */
-  .pl-hero {
-    padding: 4rem 3rem 3.5rem;
-    position: relative;
-    overflow: hidden;
-    min-height: 320px;
-    display: flex;
-    align-items: center;
+  .animate-grid-in  { animation: gridIn 0.35s both; }
+  .animate-sk-pulse {
+    background: linear-gradient(90deg, #f5f5f5 25%, #ebebeb 50%, #f5f5f5 75%);
+    background-size: 200% 100%;
+    animation: skShimmer 1.5s infinite;
   }
 
-  /* slideshow layers */
-  .pl-hero-slide {
-    position: absolute; inset: 0;
-    background-size: cover;
-    background-position: center;
-    transition: opacity 1.4s ease;
-    z-index: 0;
-  }
+  .font-syne       { font-family: 'Syne', sans-serif; }
+  .font-instrument { font-family: 'Instrument Serif', serif; }
 
-  /* dark gradient — heavy left so text stays readable */
-  .pl-hero-overlay {
-    position: absolute; inset: 0;
-    background: linear-gradient(
-      105deg,
-      rgba(0,0,0,0.9) 0%,
-      rgba(0,0,0,0.65) 45%,
-      rgba(0,0,0,0.25) 100%
-    );
-    z-index: 1;
-    pointer-events: none;
-  }
-
-  /* subtle diagonal texture on top */
-  .pl-hero-texture {
-    position: absolute; inset: 0;
-    background: repeating-linear-gradient(
-      45deg,
-      rgba(255,255,255,0.012) 0px, rgba(255,255,255,0.012) 1px,
-      transparent 1px, transparent 40px
-    );
-    z-index: 2;
-    pointer-events: none;
-  }
-
-  .pl-hero-inner {
-    position: relative;
-    z-index: 3;
-    max-width: 680px;
-  }
-
-  .pl-hero-tag {
-    display: inline-flex; align-items: center; gap: 7px;
-    border: 1px solid rgba(255,255,255,0.2);
-    border-radius: 100px;
-    padding: 5px 14px 5px 9px;
-    font-size: 10.5px; font-weight: 700;
-    letter-spacing: 0.1em; text-transform: uppercase;
-    color: rgba(255,255,255,0.7);
-    margin-bottom: 1.2rem;
-    width: fit-content;
-    background: rgba(255,255,255,0.07);
-    backdrop-filter: blur(4px);
-  }
-
-  .pl-hero-tag-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
-
-  .pl-hero-title {
-    font-size: clamp(2.4rem, 5vw, 3.8rem);
-    font-weight: 800; color: #fff;
-    line-height: 1.1; margin-bottom: 1rem;
-    text-shadow: 0 2px 30px rgba(0,0,0,0.4);
-  }
-  .pl-hero-title em {
-    font-family: 'Instrument Serif', serif;
-    font-style: italic; font-weight: 400;
-  }
-
-  .pl-hero-tagline {
-    font-size: 15px; color: rgba(255,255,255,0.5);
-    font-weight: 400; margin-bottom: 2rem;
-    max-width: 440px; line-height: 1.6;
-  }
-
-  .pl-hero-meta {
-    display: flex; align-items: center;
-    gap: 1.5rem; flex-wrap: wrap;
-    margin-bottom: 1.5rem;
-  }
-
-  .pl-hero-count { font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.5); }
-  .pl-hero-count strong { color: #fff; font-size: 15px; }
-
-  .hero-divider { width: 1px; height: 20px; background: rgba(255,255,255,0.15); }
-
-  .pl-hero-sort {
+  /* hero sort select — custom arrow + glassmorphism hard to replicate with Tailwind alone */
+  .hero-sort {
     appearance: none;
     background: rgba(255,255,255,0.1) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.6)' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat right 12px center;
     backdrop-filter: blur(4px);
@@ -205,142 +120,8 @@ const styles = `
     cursor: pointer; outline: none;
     transition: border-color 0.2s, background 0.2s;
   }
-  .pl-hero-sort:hover { background: rgba(255,255,255,0.16); }
-  .pl-hero-sort option { background: #1a1a2e; color: #f0f0f0; font-family: 'Syne', sans-serif; font-weight: 600; }
-
-  /* dot indicators */
-  .pl-hero-dots { display: flex; gap: 6px; }
-  .pl-hero-dot {
-    width: 6px; height: 6px; border-radius: 50%;
-    background: rgba(255,255,255,0.25);
-    border: none; cursor: pointer; padding: 0;
-    transition: background 0.3s, width 0.3s;
-  }
-  .pl-hero-dot.on { width: 20px; border-radius: 3px; }
-
-  /* ── TOOLBAR ── */
-  .pl-toolbar {
-    background: #fff;
-    border-bottom: 1px solid #efefef;
-    padding: 0.85rem 3rem;
-    display: flex; align-items: center;
-    gap: 10px; flex-wrap: wrap;
-    position: sticky; top: 0; z-index: 9;
-    box-shadow: 0 1px 10px rgba(0,0,0,0.04);
-  }
-
-  .toolbar-label {
-    font-size: 11px; font-weight: 700;
-    letter-spacing: 0.08em; text-transform: uppercase;
-    color: #ccc; margin-right: 4px;
-  }
-
-  .filter-chip {
-    display: inline-flex; align-items: center; gap: 5px;
-    border: 1.5px solid #efefef; background: #fafafa;
-    border-radius: 100px; padding: 5px 14px;
-    font-size: 12px; font-weight: 600; color: #666;
-    cursor: pointer; transition: all 0.15s;
-    font-family: 'Syne', sans-serif; white-space: nowrap;
-  }
-  .filter-chip:hover { border-color: #ff2d6b; color: #ff2d6b; background: #fff0f4; }
-  .filter-chip.active { background: #ff2d6b; border-color: #ff2d6b; color: #fff; }
-  .filter-chip.active:hover { background: #e01f59; }
-  .chip-x { font-size: 14px; line-height: 1; opacity: 0.7; }
-
-  /* ── BODY ── */
-  .pl-body {
-    display: flex; gap: 2rem;
-    padding: 2.5rem 3rem;
-    align-items: flex-start;
-    max-width: 1600px; margin: 0 auto;
-  }
-
-  /* ── SIDEBAR ── */
-  .pl-sidebar {
-    width: 220px; flex-shrink: 0; display: none;
-    position: sticky; top: 57px;
-  }
-  @media (min-width: 1024px) { .pl-sidebar { display: block; } }
-
-  .sb-widget {
-    background: #fff; border: 1px solid #f0f0f0;
-    border-radius: 18px; padding: 1.5rem; margin-bottom: 1rem;
-  }
-  .sb-widget-title {
-    font-size: 11px; font-weight: 700;
-    letter-spacing: 0.1em; text-transform: uppercase;
-    color: #ccc; margin-bottom: 1.1rem;
-  }
-  .sb-group { margin-bottom: 1.25rem; }
-  .sb-group:last-child { margin-bottom: 0; }
-  .sb-group-label { font-size: 12.5px; font-weight: 700; color: #333; margin-bottom: 0.6rem; display: block; }
-
-  .sb-opt {
-    display: flex; align-items: center; gap: 8px;
-    padding: 8px 10px; border-radius: 10px;
-    font-size: 13px; color: #666; font-weight: 500;
-    cursor: pointer; border: none; background: none;
-    width: 100%; text-align: left;
-    font-family: 'Syne', sans-serif;
-    transition: all 0.15s; margin-bottom: 2px;
-  }
-  .sb-opt:hover { background: #fff0f4; color: #ff2d6b; }
-  .sb-opt.on { background: #fff0f4; color: #ff2d6b; font-weight: 700; }
-
-  .sb-check {
-    width: 16px; height: 16px; border-radius: 5px;
-    border: 1.5px solid #e0e0e0; flex-shrink: 0;
-    display: flex; align-items: center; justify-content: center;
-    transition: all 0.15s; font-size: 9px; color: transparent;
-  }
-  .sb-opt.on .sb-check { background: #ff2d6b; border-color: #ff2d6b; color: #fff; }
-
-  .sb-divider { height: 1px; background: #f5f5f5; margin: 1rem 0; }
-  .sb-stars { color: #f5a623; font-size: 11px; letter-spacing: 1.5px; }
-
-  /* ── MAIN ── */
-  .pl-main { flex: 1; min-width: 0; }
-
-  /* ── GRID ── */
-  .pl-grid {
-    display: grid; grid-template-columns: repeat(2, 1fr);
-    gap: 1.5rem; animation: gridIn 0.35s both;
-  }
-  @media (min-width: 640px)  { .pl-grid { grid-template-columns: repeat(3, 1fr); } }
-  @media (min-width: 1280px) { .pl-grid { grid-template-columns: repeat(4, 1fr); } }
-  @keyframes gridIn {
-    from { opacity: 0; transform: translateY(12px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-
-  /* ── SKELETON ── */
-  .sk-grid {
-    display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem;
-  }
-  @media (min-width: 640px)  { .sk-grid { grid-template-columns: repeat(3, 1fr); } }
-  @media (min-width: 1280px) { .sk-grid { grid-template-columns: repeat(4, 1fr); } }
-
-  .sk-card { background: #fff; border-radius: 18px; overflow: hidden; border: 1px solid #f0f0f0; }
-  .sk-pulse {
-    background: linear-gradient(90deg, #f5f5f5 25%, #ebebeb 50%, #f5f5f5 75%);
-    background-size: 200% 100%; animation: skShimmer 1.5s infinite;
-  }
-  @keyframes skShimmer { from { background-position: 200% 0; } to { background-position: -200% 0; } }
-  .sk-img-area { height: 220px; }
-  .sk-body { padding: 1rem; }
-  .sk-ln { border-radius: 6px; margin-bottom: 9px; }
-
-  /* ── EMPTY / ERROR ── */
-  .pl-state {
-    display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
-    padding: 6rem 2rem; text-align: center;
-  }
-  .pl-state-icon { font-size: 3.5rem; margin-bottom: 1rem; }
-  .pl-state-title { font-size: 1.2rem; font-weight: 700; color: #999; margin-bottom: 0.4rem; }
-  .pl-state-sub { font-size: 13px; color: #ccc; line-height: 1.6; }
-  .pl-state.err .pl-state-title { color: #c01f45; }
+  .hero-sort:hover { background-color: rgba(255,255,255,0.16); }
+  .hero-sort option { background: #1a1a2e; color: #f0f0f0; font-family: 'Syne', sans-serif; font-weight: 600; }
 `;
 
 /* ─────────────────────────────────────────
@@ -348,14 +129,17 @@ const styles = `
 ───────────────────────────────────────── */
 function Skeleton() {
   return (
-    <div className="sk-grid">
+    <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-6">
       {[...Array(8)].map((_, i) => (
-        <div key={i} className="sk-card">
-          <div className="sk-img-area sk-pulse" style={{ animationDelay: `${i * 0.07}s` }} />
-          <div className="sk-body">
-            <div className="sk-ln sk-pulse" style={{ height: 13, width: "68%" }} />
-            <div className="sk-ln sk-pulse" style={{ height: 11, width: "44%" }} />
-            <div className="sk-ln sk-pulse" style={{ height: 16, width: "52%", marginTop: 12 }} />
+        <div key={i} className="bg-white rounded-[18px] overflow-hidden border border-[#f0f0f0]">
+          <div
+            className="h-[220px] animate-sk-pulse"
+            style={{ animationDelay: `${i * 0.07}s` }}
+          />
+          <div className="p-4">
+            <div className="animate-sk-pulse rounded-md mb-2.5" style={{ height: 13, width: "68%" }} />
+            <div className="animate-sk-pulse rounded-md mb-2.5" style={{ height: 11, width: "44%" }} />
+            <div className="animate-sk-pulse rounded-md mt-3"   style={{ height: 16, width: "52%" }} />
           </div>
         </div>
       ))}
@@ -368,34 +152,61 @@ function Skeleton() {
 ───────────────────────────────────────── */
 function Sidebar({ activePrice, setActivePrice, activeRating, setActiveRating }) {
   return (
-    <aside className="pl-sidebar">
-      <div className="sb-widget">
-        <p className="sb-widget-title">Refine</p>
-        <div className="sb-group">
-          <span className="sb-group-label">Price Range</span>
-          {PRICE_OPTS.map(f => (
+    <aside className="hidden lg:block w-[220px] flex-shrink-0 sticky top-[57px]">
+      <div className="bg-white border border-[#f0f0f0] rounded-[18px] p-6 mb-4">
+        <p className="text-[11px] font-bold tracking-[0.1em] uppercase text-[#ccc] mb-[1.1rem]">
+          Refine
+        </p>
+
+        {/* Price Range */}
+        <div className="mb-5">
+          <span className="block text-[12.5px] font-bold text-[#333] mb-2.5">Price Range</span>
+          {PRICE_OPTS.map((f) => (
             <button
               key={f.value}
-              className={`sb-opt${activePrice === f.value ? " on" : ""}`}
               onClick={() => setActivePrice(activePrice === f.value ? null : f.value)}
+              className={`flex items-center gap-2 w-full px-2.5 py-2 rounded-[10px] text-[13px] font-medium font-syne text-left transition-all duration-150 mb-0.5
+                ${activePrice === f.value
+                  ? "bg-[#fff0f4] text-[#ff2d6b] font-bold"
+                  : "text-[#666] hover:bg-[#fff0f4] hover:text-[#ff2d6b]"
+                }`}
             >
-              <span className="sb-check">✓</span>
+              <span className={`w-4 h-4 rounded-[5px] border-[1.5px] flex-shrink-0 flex items-center justify-center text-[9px] transition-all duration-150
+                ${activePrice === f.value
+                  ? "bg-[#ff2d6b] border-[#ff2d6b] text-white"
+                  : "border-[#e0e0e0] text-transparent"
+                }`}>
+                ✓
+              </span>
               {f.label}
             </button>
           ))}
         </div>
-        <div className="sb-divider" />
-        <div className="sb-group">
-          <span className="sb-group-label">Rating</span>
-          {RATING_OPTS.map(f => (
+
+        <div className="h-px bg-[#f5f5f5] my-4" />
+
+        {/* Rating */}
+        <div>
+          <span className="block text-[12.5px] font-bold text-[#333] mb-2.5">Rating</span>
+          {RATING_OPTS.map((f) => (
             <button
               key={f.value}
-              className={`sb-opt${activeRating === f.value ? " on" : ""}`}
               onClick={() => setActiveRating(activeRating === f.value ? null : f.value)}
+              className={`flex items-center gap-2 w-full px-2.5 py-2 rounded-[10px] text-[13px] font-medium font-syne text-left transition-all duration-150 mb-0.5
+                ${activeRating === f.value
+                  ? "bg-[#fff0f4] text-[#ff2d6b] font-bold"
+                  : "text-[#666] hover:bg-[#fff0f4] hover:text-[#ff2d6b]"
+                }`}
             >
-              <span className="sb-check">✓</span>
-              <span className="sb-stars">{f.stars}</span>
-              <span style={{ fontSize: 11, color: "inherit" }}>{f.label}</span>
+              <span className={`w-4 h-4 rounded-[5px] border-[1.5px] flex-shrink-0 flex items-center justify-center text-[9px] transition-all duration-150
+                ${activeRating === f.value
+                  ? "bg-[#ff2d6b] border-[#ff2d6b] text-white"
+                  : "border-[#e0e0e0] text-transparent"
+                }`}>
+                ✓
+              </span>
+              <span className="text-[#f5a623] text-[11px] tracking-[1.5px]">{f.stars}</span>
+              <span className="text-[11px]">{f.label}</span>
             </button>
           ))}
         </div>
@@ -408,19 +219,19 @@ function Sidebar({ activePrice, setActivePrice, activeRating, setActiveRating })
    MAIN COMPONENT
 ───────────────────────────────────────── */
 function ProductList() {
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [sort, setSort] = useState("");
-  const [activePrice, setActivePrice] = useState(null);
+  const [products, setProducts]     = useState([]);
+  const [loading, setLoading]       = useState(true);
+  const [error, setError]           = useState(null);
+  const [sort, setSort]             = useState("");
+  const [activePrice, setActivePrice]   = useState(null);
   const [activeRating, setActiveRating] = useState(null);
-  const [heroSlide, setHeroSlide] = useState(0);
+  const [heroSlide, setHeroSlide]   = useState(0);
 
   const location = useLocation();
-  const params = new URLSearchParams(location.search);
-  const search = params.get("search");
+  const params   = new URLSearchParams(location.search);
+  const search   = params.get("search");
   const category = params.get("category");
-  const BASEURL = import.meta.env.VITE_DJANGO_BASE_URL;
+  const BASEURL  = import.meta.env.VITE_DJANGO_BASE_URL;
 
   // — fetch (original logic unchanged) —
   useEffect(() => {
@@ -428,7 +239,7 @@ function ProductList() {
     setError(null);
     let url = `${BASEURL}/api/products/`;
     const queryParams = [];
-    if (search && search.trim() !== "") queryParams.push(`search=${search}`);
+    if (search   && search.trim()   !== "") queryParams.push(`search=${search}`);
     if (category && category.trim() !== "") queryParams.push(`category=${category}`);
     if (queryParams.length > 0) url += `?${queryParams.join("&")}`;
     fetch(url)
@@ -450,80 +261,101 @@ function ProductList() {
   // — derive labels —
   const tagLabel = category ? category.toUpperCase() : search ? "SEARCH RESULTS" : "ALL PRODUCTS";
   let heroTitle, heroTitleEm;
-  if (search) { heroTitle = "Results for "; heroTitleEm = `"${search}"`; }
+  if (search)        { heroTitle = "Results for "; heroTitleEm = `"${search}"`; }
   else if (category) { heroTitle = ""; heroTitleEm = category.charAt(0).toUpperCase() + category.slice(1); }
-  else { heroTitle = "Explore "; heroTitleEm = "Everything"; }
-
-  // — active chips —
-  const activeChips = [];
-  if (activePrice) activeChips.push({ label: PRICE_OPTS.find(f => f.value === activePrice)?.label, clear: () => setActivePrice(null) });
-  if (activeRating) activeChips.push({ label: `${activeRating}★ & above`, clear: () => setActiveRating(null) });
+  else               { heroTitle = "Explore ";     heroTitleEm = "Everything"; }
 
   return (
     <>
-      <style>{styles}</style>
-      <div className="pl-root">
+      <style>{keyframes}</style>
+
+      <div className="min-h-screen bg-[#f7f7f5] font-syne text-[#111]">
 
         {/* ── HERO BANNER ── */}
-        <div className="pl-hero" style={{ background: meta.color }}>
-
-          {/* background slideshow images */}
+        <div
+          className="relative overflow-hidden min-h-[320px] flex items-center px-12 py-16 pb-14"
+          style={{ background: meta.color }}
+        >
+          {/* Background slideshow images */}
           {meta.images.map((img, i) => (
             <div
               key={i}
-              className="pl-hero-slide"
-              style={{
-                backgroundImage: `url(${img})`,
-                opacity: i === heroSlide ? 1 : 0,
-              }}
+              className="absolute inset-0 bg-cover bg-center transition-opacity duration-[1400ms] z-0"
+              style={{ backgroundImage: `url(${img})`, opacity: i === heroSlide ? 1 : 0 }}
             />
           ))}
 
-          {/* overlay + texture */}
-          <div className="pl-hero-overlay" />
-          <div className="pl-hero-texture" />
+          {/* Dark overlay */}
+          <div
+            className="absolute inset-0 z-10 pointer-events-none"
+            style={{
+              background: "linear-gradient(105deg, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.65) 45%, rgba(0,0,0,0.25) 100%)",
+            }}
+          />
 
-          {/* content */}
-          <div className="pl-hero-inner">
-            <div className="pl-hero-tag">
-              <span className="pl-hero-tag-dot" style={{ background: meta.accent }} />
+          {/* Diagonal texture */}
+          <div
+            className="absolute inset-0 z-20 pointer-events-none"
+            style={{
+              background: "repeating-linear-gradient(45deg, rgba(255,255,255,0.012) 0px, rgba(255,255,255,0.012) 1px, transparent 1px, transparent 40px)",
+            }}
+          />
+
+          {/* Content */}
+          <div className="relative z-30 max-w-[680px]">
+            {/* Tag */}
+            <div className="inline-flex items-center gap-1.5 border border-white/20 rounded-full px-[14px] py-[5px] pl-[9px] text-[10.5px] font-bold tracking-[0.1em] uppercase text-white/70 mb-5 w-fit bg-white/[0.07] backdrop-blur-sm">
+              <span className="w-[7px] h-[7px] rounded-full flex-shrink-0" style={{ background: meta.accent }} />
               {tagLabel}
             </div>
 
-            <h1 className="pl-hero-title">
-              {heroTitle}<em style={{ color: meta.accent }}>{heroTitleEm}</em>
+            {/* Title */}
+            <h1
+              className="font-extrabold text-white leading-[1.1] mb-4 tracking-[-0.03em]"
+              style={{ fontSize: "clamp(2.4rem, 5vw, 3.8rem)", textShadow: "0 2px 30px rgba(0,0,0,0.4)" }}
+            >
+              {heroTitle}
+              <em className="font-instrument italic font-normal not-italic" style={{ color: meta.accent, fontStyle: "italic" }}>
+                {heroTitleEm}
+              </em>
             </h1>
 
-            <p className="pl-hero-tagline">{meta.tagline}</p>
+            {/* Tagline */}
+            <p className="text-[15px] text-white/50 font-normal mb-8 max-w-[440px] leading-relaxed">
+              {meta.tagline}
+            </p>
 
-            <div className="pl-hero-meta">
+            {/* Meta row */}
+            <div className="flex items-center gap-6 flex-wrap mb-6">
               {!loading && (
                 <>
-                  <span className="pl-hero-count">
-                    <strong>{products.length}</strong> products found
+                  <span className="text-[13px] font-semibold text-white/50">
+                    <strong className="text-white text-[15px]">{products.length}</strong> products found
                   </span>
-                  <span className="hero-divider" />
+                  <span className="w-px h-5 bg-white/15" />
                 </>
               )}
               <select
-                className="pl-hero-sort"
+                className="hero-sort"
                 value={sort}
-                onChange={e => setSort(e.target.value)}
+                onChange={(e) => setSort(e.target.value)}
               >
-                {SORT_OPTS.map(o => (
+                {SORT_OPTS.map((o) => (
                   <option key={o.value} value={o.value}>{o.label}</option>
                 ))}
               </select>
             </div>
 
-            {/* dot indicators */}
-            <div className="pl-hero-dots">
+            {/* Slide dots */}
+            <div className="flex gap-1.5">
               {meta.images.map((_, i) => (
                 <button
                   key={i}
-                  className={"pl-hero-dot" + (i === heroSlide ? " on" : "")}
-                  style={i === heroSlide ? { background: meta.accent } : {}}
                   onClick={() => setHeroSlide(i)}
+                  className={`h-1.5 rounded-full border-none cursor-pointer p-0 transition-all duration-300 ${
+                    i === heroSlide ? "w-5 rounded-sm" : "w-1.5 bg-white/25"
+                  }`}
+                  style={i === heroSlide ? { background: meta.accent } : {}}
                 />
               ))}
             </div>
@@ -531,55 +363,72 @@ function ProductList() {
         </div>
 
         {/* ── STICKY FILTER TOOLBAR ── */}
-        <div className="pl-toolbar">
-          <span className="toolbar-label">Filter</span>
-          {PRICE_OPTS.map(f => (
+        <div className="bg-white border-b border-[#efefef] px-12 py-[0.85rem] flex items-center gap-2.5 flex-wrap sticky top-0 z-[9] shadow-[0_1px_10px_rgba(0,0,0,0.04)]">
+          <span className="text-[11px] font-bold tracking-[0.08em] uppercase text-[#ccc] mr-1">
+            Filter
+          </span>
+
+          {PRICE_OPTS.map((f) => (
             <button
               key={f.value}
-              className={`filter-chip${activePrice === f.value ? " active" : ""}`}
               onClick={() => setActivePrice(activePrice === f.value ? null : f.value)}
+              className={`inline-flex items-center gap-1 border-[1.5px] rounded-full px-3.5 py-[5px] text-xs font-semibold font-syne whitespace-nowrap cursor-pointer transition-all duration-150
+                ${activePrice === f.value
+                  ? "bg-[#ff2d6b] border-[#ff2d6b] text-white hover:bg-[#e01f59]"
+                  : "border-[#efefef] bg-[#fafafa] text-[#666] hover:border-[#ff2d6b] hover:text-[#ff2d6b] hover:bg-[#fff0f4]"
+                }`}
             >
               {f.label}
-              {activePrice === f.value && <span className="chip-x">×</span>}
+              {activePrice === f.value && <span className="text-sm leading-none opacity-70">×</span>}
             </button>
           ))}
-          {RATING_OPTS.slice(0, 2).map(f => (
+
+          {RATING_OPTS.slice(0, 2).map((f) => (
             <button
               key={f.value}
-              className={`filter-chip${activeRating === f.value ? " active" : ""}`}
               onClick={() => setActiveRating(activeRating === f.value ? null : f.value)}
+              className={`inline-flex items-center gap-1 border-[1.5px] rounded-full px-3.5 py-[5px] text-xs font-semibold font-syne whitespace-nowrap cursor-pointer transition-all duration-150
+                ${activeRating === f.value
+                  ? "bg-[#ff2d6b] border-[#ff2d6b] text-white hover:bg-[#e01f59]"
+                  : "border-[#efefef] bg-[#fafafa] text-[#666] hover:border-[#ff2d6b] hover:text-[#ff2d6b] hover:bg-[#fff0f4]"
+                }`}
             >
               ★ {f.value}+
-              {activeRating === f.value && <span className="chip-x">×</span>}
+              {activeRating === f.value && <span className="text-sm leading-none opacity-70">×</span>}
             </button>
           ))}
         </div>
 
         {/* ── BODY ── */}
         {error ? (
-          <div className="pl-state err" style={{ padding: "5rem 3rem" }}>
-            <div className="pl-state-icon">⚠️</div>
-            <p className="pl-state-title">Something went wrong</p>
-            <p className="pl-state-sub">{error}</p>
+          <div className="flex flex-col items-center justify-center px-12 py-20 text-center">
+            <div className="text-[3.5rem] mb-4">⚠️</div>
+            <p className="text-[1.2rem] font-bold text-[#c01f45] mb-1">Something went wrong</p>
+            <p className="text-[13px] text-[#ccc] leading-relaxed">{error}</p>
           </div>
         ) : (
-          <div className="pl-body">
+          <div className="flex gap-8 px-12 py-10 items-start max-w-[1600px] mx-auto">
             <Sidebar
-              activePrice={activePrice} setActivePrice={setActivePrice}
+              activePrice={activePrice}   setActivePrice={setActivePrice}
               activeRating={activeRating} setActiveRating={setActiveRating}
             />
-            <div className="pl-main">
-              {loading ? <Skeleton /> : products.length > 0 ? (
-                <div className="pl-grid">
-                  {products.map(product => (
+
+            <div className="flex-1 min-w-0">
+              {loading ? (
+                <Skeleton />
+              ) : products.length > 0 ? (
+                <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-6 animate-grid-in">
+                  {products.map((product) => (
                     <ProductCard key={product.id} product={product} />
                   ))}
                 </div>
               ) : (
-                <div className="pl-state">
-                  <div className="pl-state-icon">🛍️</div>
-                  <p className="pl-state-title">No products found</p>
-                  <p className="pl-state-sub">Try adjusting your filters<br />or search for something else</p>
+                <div className="flex flex-col items-center justify-center py-24 px-8 text-center">
+                  <div className="text-[3.5rem] mb-4">🛍️</div>
+                  <p className="text-[1.2rem] font-bold text-[#999] mb-1">No products found</p>
+                  <p className="text-[13px] text-[#ccc] leading-relaxed">
+                    Try adjusting your filters<br />or search for something else
+                  </p>
                 </div>
               )}
             </div>

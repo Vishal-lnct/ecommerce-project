@@ -1,269 +1,16 @@
 import { useCart } from "../context/CartContext";
 import { Link } from "react-router-dom";
 
-const styles = `
+// Only keyframes + font import — can't be expressed with Tailwind utilities alone
+const keyframes = `
   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-  .cart-root {
-    min-height: 100vh;
-    background: #f5f5f5;
-    font-family: 'Inter', sans-serif;
-    padding-bottom: 5rem;
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.35; }
   }
-
-  /* ── HERO ── */
-  .cart-hero {
-    background: #111;
-    padding: 3rem 4rem 2.5rem;
-    position: relative;
-  }
-  .cart-hero::after {
-    content: '';
-    position: absolute; inset: 0;
-    background: repeating-linear-gradient(
-      45deg,
-      rgba(255,255,255,0.015) 0px, rgba(255,255,255,0.015) 1px,
-      transparent 1px, transparent 44px
-    );
-    pointer-events: none;
-  }
-  .cart-hero-inner { position: relative; z-index: 1; }
-
-  .cart-hero-tag {
-    display: inline-flex; align-items: center; gap: 7px;
-    border: 1px solid rgba(255,255,255,0.15);
-    border-radius: 100px;
-    padding: 4px 13px 4px 9px;
-    font-size: 11px; font-weight: 600;
-    letter-spacing: 0.07em; text-transform: uppercase;
-    color: rgba(255,255,255,0.4);
-    margin-bottom: 1rem;
-    background: rgba(255,255,255,0.05);
-    width: fit-content;
-  }
-  .cart-hero-dot {
-    width: 7px; height: 7px; border-radius: 50%;
-    background: #ff2d6b; animation: pulse 2s infinite;
-  }
-  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.35} }
-
-  .cart-hero-title {
-    font-size: 3rem; font-weight: 800;
-    color: #fff; line-height: 1.1;
-    letter-spacing: -0.03em; margin-bottom: 0.5rem;
-  }
-  .cart-hero-title span { color: #ff2d6b; }
-
-  .cart-hero-sub {
-    font-size: 14px; color: rgba(255,255,255,0.35); font-weight: 400;
-  }
-
-  /* ── BODY ── */
-  .cart-body {
-    max-width: 1100px;
-    margin: 0 auto;
-    padding: 2.5rem 2rem 0;
-    display: grid;
-    grid-template-columns: 1fr 340px;
-    gap: 1.75rem;
-    align-items: flex-start;
-  }
-  @media (max-width: 900px) {
-    .cart-body { grid-template-columns: 1fr; }
-  }
-
-  /* ── EMPTY ── */
-  .cart-empty {
-    grid-column: 1 / -1;
-    display: flex; flex-direction: column;
-    align-items: center; padding: 7rem 2rem; text-align: center;
-  }
-  .cart-empty-icon {
-    width: 88px; height: 88px; border-radius: 50%;
-    background: #fff0f4;
-    display: flex; align-items: center; justify-content: center;
-    margin-bottom: 1.5rem;
-  }
-  .cart-empty-title { font-size: 1.3rem; font-weight: 700; color: #444; margin-bottom: 0.5rem; }
-  .cart-empty-sub { font-size: 15px; color: #aaa; line-height: 1.7; margin-bottom: 1.5rem; }
-  .cart-shop-btn {
-    display: inline-flex; align-items: center; gap: 8px;
-    padding: 12px 24px;
-    background: #ff2d6b; color: #fff;
-    border: none; border-radius: 12px;
-    font-family: 'Inter', sans-serif;
-    font-size: 14px; font-weight: 700;
-    cursor: pointer; text-decoration: none;
-    transition: background 0.15s, transform 0.15s;
-  }
-  .cart-shop-btn:hover { background: #e01f59; transform: translateY(-1px); }
-
-  /* ── ITEMS PANEL ── */
-  .cart-items-panel {
-    background: #fff;
-    border: 1px solid #e8e8e8;
-    border-radius: 20px;
-    overflow: hidden;
-    box-shadow: 0 2px 16px rgba(0,0,0,0.05);
-  }
-
-  .cart-panel-head {
-    padding: 1.4rem 1.75rem;
-    border-bottom: 1px solid #f2f2f2;
-    display: flex; align-items: center; justify-content: space-between;
-  }
-  .cart-panel-title {
-    font-size: 15px; font-weight: 700; color: #111;
-  }
-  .cart-item-count {
-    background: #f5f5f5;
-    border-radius: 100px;
-    padding: 4px 12px;
-    font-size: 12px; font-weight: 600; color: #888;
-  }
-
-  /* ── ITEM ROW ── */
-  .cart-item {
-    display: flex; align-items: center;
-    gap: 1.25rem;
-    padding: 1.4rem 1.75rem;
-    border-bottom: 1px solid #f7f7f7;
-    transition: background 0.15s;
-  }
-  .cart-item:last-child { border-bottom: none; }
-  .cart-item:hover { background: #fafafa; }
-
-  .cart-item-img {
-    width: 84px; height: 84px;
-    object-fit: cover; border-radius: 14px;
-    background: #f5f5f5; flex-shrink: 0;
-    border: 1px solid #efefef;
-  }
-
-  .cart-item-info { flex: 1; min-width: 0; }
-
-  .cart-item-name {
-    font-size: 15px; font-weight: 600; color: #111;
-    margin-bottom: 5px;
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  }
-  .cart-item-price {
-    font-size: 15px; font-weight: 800; color: #111;
-    letter-spacing: -0.02em;
-  }
-
-  .cart-item-actions {
-    display: flex; align-items: center; gap: 10px; flex-shrink: 0;
-  }
-
-  /* qty controls */
-  .qty-wrap {
-    display: flex; align-items: center;
-    background: #f5f5f5;
-    border-radius: 10px;
-    overflow: hidden;
-    border: 1px solid #efefef;
-  }
-  .qty-btn {
-    width: 34px; height: 34px;
-    background: none; border: none;
-    font-size: 16px; font-weight: 700; color: #555;
-    cursor: pointer; display: flex; align-items: center; justify-content: center;
-    transition: background 0.15s, color 0.15s;
-    font-family: 'Inter', sans-serif;
-  }
-  .qty-btn:hover { background: #ffe8ee; color: #ff2d6b; }
-  .qty-val {
-    font-size: 14px; font-weight: 700; color: #111;
-    min-width: 28px; text-align: center;
-  }
-
-  /* remove */
-  .cart-remove-btn {
-    width: 34px; height: 34px;
-    background: #fff; border: 1.5px solid #efefef;
-    border-radius: 9px; cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    transition: background 0.15s, border-color 0.15s;
-  }
-  .cart-remove-btn:hover { background: #fff0f4; border-color: #ffc5d3; }
-  .cart-remove-btn:hover svg { stroke: #ff2d6b; }
-  .cart-remove-btn svg { transition: stroke 0.15s; }
-
-  /* item subtotal */
-  .cart-item-subtotal {
-    font-size: 15px; font-weight: 800; color: #111;
-    min-width: 72px; text-align: right;
-    letter-spacing: -0.02em;
-  }
-
-  /* ── SUMMARY PANEL ── */
-  .cart-summary {
-    background: #fff;
-    border: 1px solid #e8e8e8;
-    border-radius: 20px;
-    overflow: hidden;
-    box-shadow: 0 2px 16px rgba(0,0,0,0.05);
-    position: sticky;
-    top: 80px;
-  }
-
-  .cart-summary-head {
-    padding: 1.4rem 1.75rem;
-    border-bottom: 1px solid #f2f2f2;
-  }
-  .cart-summary-title {
-    font-size: 15px; font-weight: 700; color: #111;
-  }
-
-  .cart-summary-body { padding: 1.5rem 1.75rem; }
-
-  .summary-row {
-    display: flex; align-items: center; justify-content: space-between;
-    margin-bottom: 1rem; font-size: 14px;
-  }
-  .summary-row-label { color: #888; font-weight: 500; }
-  .summary-row-val { color: #111; font-weight: 600; }
-  .summary-row-val.free { color: #1a7f4b; font-weight: 700; }
-
-  .summary-divider { height: 1px; background: #f2f2f2; margin: 1rem 0; }
-
-  .summary-total-row {
-    display: flex; align-items: center; justify-content: space-between;
-    margin-bottom: 1.5rem;
-  }
-  .summary-total-label {
-    font-size: 15px; font-weight: 700; color: #111;
-  }
-  .summary-total-val {
-    font-size: 1.5rem; font-weight: 800; color: #111;
-    letter-spacing: -0.03em;
-  }
-
-  .checkout-btn {
-    display: flex; align-items: center; justify-content: center; gap: 8px;
-    width: 100%; padding: 15px;
-    background: #ff2d6b; color: #fff;
-    border: none; border-radius: 13px;
-    font-family: 'Inter', sans-serif;
-    font-size: 15px; font-weight: 700;
-    cursor: pointer; text-decoration: none;
-    transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
-    letter-spacing: 0.01em;
-  }
-  .checkout-btn:hover {
-    background: #e01f59;
-    transform: translateY(-2px);
-    box-shadow: 0 8px 28px rgba(255,45,107,0.35);
-  }
-
-  .summary-note {
-    text-align: center; font-size: 12px; color: #ccc;
-    margin-top: 1rem; line-height: 1.5;
-    display: flex; align-items: center; justify-content: center; gap: 5px;
-  }
+  .animate-pulse-dot { animation: pulse 2s infinite; }
+  .font-inter { font-family: 'Inter', sans-serif; }
 `;
 
 function CartPage() {
@@ -274,20 +21,30 @@ function CartPage() {
 
   return (
     <>
-      <style>{styles}</style>
-      <div className="cart-root">
+      <style>{keyframes}</style>
 
-        {/* HERO */}
-        <div className="cart-hero">
-          <div className="cart-hero-inner">
-            <div className="cart-hero-tag">
-              <span className="cart-hero-dot" />
+      <div className="min-h-screen bg-[#f5f5f5] font-inter pb-20">
+
+        {/* ── HERO ── */}
+        <div
+          className="bg-[#111] px-16 pt-12 pb-10 relative"
+          style={{
+            backgroundImage:
+              "repeating-linear-gradient(45deg, rgba(255,255,255,0.015) 0px, rgba(255,255,255,0.015) 1px, transparent 1px, transparent 44px)",
+          }}
+        >
+          <div className="relative z-10">
+            {/* Tag */}
+            <div className="inline-flex items-center gap-1.5 border border-white/15 rounded-full px-[13px] py-1 pl-[9px] text-[11px] font-semibold tracking-[0.07em] uppercase text-white/40 mb-4 bg-white/[0.05] w-fit">
+              <span className="w-[7px] h-[7px] rounded-full bg-[#ff2d6b] animate-pulse-dot" />
               Shopping
             </div>
-            <h1 className="cart-hero-title">
-              Your <span>Bag</span>
+
+            <h1 className="text-[3rem] font-extrabold text-white leading-[1.1] tracking-[-0.03em] mb-2">
+              Your <span className="text-[#ff2d6b]">Bag</span>
             </h1>
-            <p className="cart-hero-sub">
+
+            <p className="text-sm text-white/35 font-normal">
               {cartItems.length > 0
                 ? `${cartItems.length} item${cartItems.length !== 1 ? "s" : ""} in your cart`
                 : "Your cart is waiting to be filled"}
@@ -295,34 +52,45 @@ function CartPage() {
           </div>
         </div>
 
-        {/* BODY */}
-        <div className="cart-body">
-          {cartItems.length === 0 ? (
+        {/* ── BODY ── */}
+        <div className="max-w-[1100px] mx-auto px-8 pt-10 grid grid-cols-1 md:grid-cols-[1fr_340px] gap-7 items-start">
 
-            <div className="cart-empty">
-              <div className="cart-empty-icon">
+          {/* ── EMPTY STATE ── */}
+          {cartItems.length === 0 ? (
+            <div className="col-span-full flex flex-col items-center py-28 px-8 text-center">
+              <div className="w-[88px] h-[88px] rounded-full bg-[#fff0f4] flex items-center justify-center mb-6">
                 <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#ff2d6b" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
                   <line x1="3" y1="6" x2="21" y2="6"/>
                   <path d="M16 10a4 4 0 0 1-8 0"/>
                 </svg>
               </div>
-              <p className="cart-empty-title">Your cart is empty</p>
-              <p className="cart-empty-sub">Looks like you haven't added<br />anything to your bag yet.</p>
-              <Link to="/" className="cart-shop-btn">
+              <p className="text-[1.3rem] font-bold text-[#444] mb-2">Your cart is empty</p>
+              <p className="text-[15px] text-[#aaa] leading-[1.7] mb-6">
+                Looks like you haven't added<br />anything to your bag yet.
+              </p>
+              <Link
+                to="/"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-[#ff2d6b] text-white border-none rounded-xl font-inter text-sm font-bold cursor-pointer no-underline transition-all duration-150 hover:bg-[#e01f59] hover:-translate-y-px"
+              >
                 Start Shopping →
               </Link>
             </div>
 
           ) : (
             <>
-              {/* ITEMS */}
-              <div className="cart-items-panel">
-                <div className="cart-panel-head">
-                  <span className="cart-panel-title">Cart Items</span>
-                  <span className="cart-item-count">{cartItems.length} item{cartItems.length !== 1 ? "s" : ""}</span>
+              {/* ── ITEMS PANEL ── */}
+              <div className="bg-white border border-[#e8e8e8] rounded-[20px] overflow-hidden shadow-[0_2px_16px_rgba(0,0,0,0.05)]">
+
+                {/* Panel header */}
+                <div className="flex items-center justify-between px-7 py-[1.4rem] border-b border-[#f2f2f2]">
+                  <span className="text-[15px] font-bold text-[#111]">Cart Items</span>
+                  <span className="bg-[#f5f5f5] rounded-full px-3 py-1 text-xs font-semibold text-[#888]">
+                    {cartItems.length} item{cartItems.length !== 1 ? "s" : ""}
+                  </span>
                 </div>
 
+                {/* Item rows */}
                 {cartItems.map((item) => {
                   // Fix image URL — original logic
                   const imageUrl = item.product_image?.startsWith("http")
@@ -332,41 +100,61 @@ function CartPage() {
                   const subtotal = (item.product_price * item.quantity).toFixed(2);
 
                   return (
-                    <div key={item.id} className="cart-item">
-
+                    <div
+                      key={item.id}
+                      className="flex items-center gap-5 px-7 py-[1.4rem] border-b border-[#f7f7f7] last:border-b-0 transition-colors duration-150 hover:bg-[#fafafa]"
+                    >
+                      {/* Image */}
                       <img
-                        className="cart-item-img"
+                        className="w-[84px] h-[84px] object-cover rounded-[14px] bg-[#f5f5f5] flex-shrink-0 border border-[#efefef]"
                         src={imageUrl}
                         alt={item.product_name}
-                        onError={e => { e.target.src = "https://picsum.photos/84"; }}
+                        onError={(e) => { e.target.src = "https://picsum.photos/84"; }}
                       />
 
-                      <div className="cart-item-info">
-                        <p className="cart-item-name">{item.product_name}</p>
-                        <p className="cart-item-price">₹{item.product_price}</p>
+                      {/* Info */}
+                      <div className="flex-1 min-w-0">
+                        <p className="text-[15px] font-semibold text-[#111] mb-1 truncate">
+                          {item.product_name}
+                        </p>
+                        <p className="text-[15px] font-extrabold text-[#111] tracking-[-0.02em]">
+                          ₹{item.product_price}
+                        </p>
                       </div>
 
-                      <div className="cart-item-actions">
-                        {/* QTY CONTROLS — original logic */}
-                        <div className="qty-wrap">
+                      {/* Actions */}
+                      <div className="flex items-center gap-2.5 flex-shrink-0">
+
+                        {/* Qty controls */}
+                        <div className="flex items-center bg-[#f5f5f5] rounded-[10px] overflow-hidden border border-[#efefef]">
                           <button
-                            className="qty-btn"
                             onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                          >−</button>
-                          <span className="qty-val">{item.quantity}</span>
+                            className="w-[34px] h-[34px] bg-transparent border-none text-base font-bold text-[#555] cursor-pointer flex items-center justify-center font-inter transition-all duration-150 hover:bg-[#ffe8ee] hover:text-[#ff2d6b]"
+                          >
+                            −
+                          </button>
+                          <span className="text-sm font-bold text-[#111] min-w-[28px] text-center">
+                            {item.quantity}
+                          </span>
                           <button
-                            className="qty-btn"
                             onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                          >+</button>
+                            className="w-[34px] h-[34px] bg-transparent border-none text-base font-bold text-[#555] cursor-pointer flex items-center justify-center font-inter transition-all duration-150 hover:bg-[#ffe8ee] hover:text-[#ff2d6b]"
+                          >
+                            +
+                          </button>
                         </div>
 
-                        {/* REMOVE — original logic */}
+                        {/* Remove button */}
                         <button
-                          className="cart-remove-btn"
                           onClick={() => removeFromCart(item.id)}
                           title="Remove item"
+                          className="w-[34px] h-[34px] bg-white border-[1.5px] border-[#efefef] rounded-[9px] cursor-pointer flex items-center justify-center transition-all duration-150 group hover:bg-[#fff0f4] hover:border-[#ffc5d3]"
                         >
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#aaa" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                          <svg
+                            width="14" height="14" viewBox="0 0 24 24" fill="none"
+                            stroke="#aaa" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"
+                            className="transition-[stroke] duration-150 group-hover:stroke-[#ff2d6b]"
+                          >
                             <polyline points="3 6 5 6 21 6"/>
                             <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
                             <path d="M10 11v6M14 11v6"/>
@@ -375,39 +163,58 @@ function CartPage() {
                         </button>
                       </div>
 
-                      <span className="cart-item-subtotal">₹{subtotal}</span>
+                      {/* Subtotal */}
+                      <span className="text-[15px] font-extrabold text-[#111] min-w-[72px] text-right tracking-[-0.02em]">
+                        ₹{subtotal}
+                      </span>
                     </div>
                   );
                 })}
               </div>
 
-              {/* ORDER SUMMARY */}
-              <div className="cart-summary">
-                <div className="cart-summary-head">
-                  <p className="cart-summary-title">Order Summary</p>
+              {/* ── ORDER SUMMARY ── */}
+              <div className="bg-white border border-[#e8e8e8] rounded-[20px] overflow-hidden shadow-[0_2px_16px_rgba(0,0,0,0.05)] sticky top-20">
+
+                {/* Summary header */}
+                <div className="px-7 py-[1.4rem] border-b border-[#f2f2f2]">
+                  <p className="text-[15px] font-bold text-[#111]">Order Summary</p>
                 </div>
-                <div className="cart-summary-body">
-                  <div className="summary-row">
-                    <span className="summary-row-label">Subtotal</span>
-                    <span className="summary-row-val">₹{total.toFixed(2)}</span>
-                  </div>
-                  <div className="summary-row">
-                    <span className="summary-row-label">Shipping</span>
-                    <span className="summary-row-val free">Free</span>
-                  </div>
-                  <div className="summary-row">
-                    <span className="summary-row-label">Tax (GST 18%)</span>
-                    <span className="summary-row-val">₹{(total * 0.18).toFixed(2)}</span>
+
+                {/* Summary body */}
+                <div className="px-7 py-6">
+                  {/* Subtotal */}
+                  <div className="flex items-center justify-between mb-4 text-sm">
+                    <span className="text-[#888] font-medium">Subtotal</span>
+                    <span className="text-[#111] font-semibold">₹{total.toFixed(2)}</span>
                   </div>
 
-                  <div className="summary-divider" />
-
-                  <div className="summary-total-row">
-                    <span className="summary-total-label">Total</span>
-                    <span className="summary-total-val">₹{(total * 1.18).toFixed(2)}</span>
+                  {/* Shipping */}
+                  <div className="flex items-center justify-between mb-4 text-sm">
+                    <span className="text-[#888] font-medium">Shipping</span>
+                    <span className="text-[#1a7f4b] font-bold">Free</span>
                   </div>
 
-                  <Link to="/checkout" className="checkout-btn">
+                  {/* Tax */}
+                  <div className="flex items-center justify-between mb-4 text-sm">
+                    <span className="text-[#888] font-medium">Tax (GST 18%)</span>
+                    <span className="text-[#111] font-semibold">₹{(total * 0.18).toFixed(2)}</span>
+                  </div>
+
+                  <div className="h-px bg-[#f2f2f2] my-4" />
+
+                  {/* Total */}
+                  <div className="flex items-center justify-between mb-6">
+                    <span className="text-[15px] font-bold text-[#111]">Total</span>
+                    <span className="text-[1.5rem] font-extrabold text-[#111] tracking-[-0.03em]">
+                      ₹{(total * 1.18).toFixed(2)}
+                    </span>
+                  </div>
+
+                  {/* Checkout button */}
+                  <Link
+                    to="/checkout"
+                    className="flex items-center justify-center gap-2 w-full py-[15px] bg-[#ff2d6b] text-white border-none rounded-[13px] font-inter text-[15px] font-bold cursor-pointer no-underline tracking-[0.01em] transition-all duration-200 hover:bg-[#e01f59] hover:-translate-y-0.5 hover:shadow-[0_8px_28px_rgba(255,45,107,0.35)]"
+                  >
                     Proceed to Checkout
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                       <line x1="5" y1="12" x2="19" y2="12"/>
@@ -415,7 +222,8 @@ function CartPage() {
                     </svg>
                   </Link>
 
-                  <p className="summary-note">
+                  {/* Note */}
+                  <p className="text-center text-xs text-[#ccc] mt-4 leading-relaxed flex items-center justify-center gap-1">
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#ccc" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
                       <path d="M7 11V7a5 5 0 0 1 10 0v4"/>

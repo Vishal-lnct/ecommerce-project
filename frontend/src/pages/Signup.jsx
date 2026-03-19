@@ -2,36 +2,12 @@ import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 
 const SLIDES = [
-  {
-    img: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600&q=80",
-    quote: "Style is a way to say who you are without speaking.",
-    tag: "ACCESSORIES",
-  },
-  {
-    img: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600&q=80",
-    quote: "Every step you take is a statement.",
-    tag: "SHOES",
-  },
-  {
-    img: "https://images.unsplash.com/photo-1551488831-00ddcb6c6bd3?w=600&q=80",
-    quote: "Wear what makes you feel unstoppable.",
-    tag: "CLOTHING",
-  },
-  {
-    img: "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=600&q=80",
-    quote: "Carry your world in style.",
-    tag: "ACCESSORIES",
-  },
-  {
-    img: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600&q=80",
-    quote: "Tech that keeps up with your life.",
-    tag: "ELECTRONICS",
-  },
-  {
-    img: "https://images.unsplash.com/photo-1585386959984-a4155224a1ad?w=600&q=80",
-    quote: "Beauty in every detail.",
-    tag: "BEAUTY",
-  },
+  { img: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600&q=80", quote: "Style is a way to say who you are without speaking.", tag: "ACCESSORIES" },
+  { img: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600&q=80", quote: "Every step you take is a statement.", tag: "SHOES" },
+  { img: "https://images.unsplash.com/photo-1551488831-00ddcb6c6bd3?w=600&q=80", quote: "Wear what makes you feel unstoppable.", tag: "CLOTHING" },
+  { img: "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=600&q=80", quote: "Carry your world in style.", tag: "ACCESSORIES" },
+  { img: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600&q=80", quote: "Tech that keeps up with your life.", tag: "ELECTRONICS" },
+  { img: "https://images.unsplash.com/photo-1585386959984-a4155224a1ad?w=600&q=80", quote: "Beauty in every detail.", tag: "BEAUTY" },
 ];
 
 const PERKS = [
@@ -40,161 +16,32 @@ const PERKS = [
   { icon: "✦", text: "Easy 30-day returns" },
 ];
 
-const styles = `
+// Keyframes + font import — can't be expressed with Tailwind utilities alone
+const keyframes = `
   @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Instrument+Serif:ital@1&display=swap');
 
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-  .su-root {
-    min-height: 100vh;
-    display: grid;
-    grid-template-columns: 520px 1fr;
-    font-family: 'Syne', sans-serif;
-    overflow: hidden;
-    background: #fff;
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes shimmer { to { left: 200%; } }
+  @keyframes slowZoom {
+    from { transform: scale(1.05); }
+    to   { transform: scale(1.0); }
   }
 
-  /* ── LEFT — FORM PANEL ── */
-  .su-form-panel {
-    background: #fff;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    padding: 3rem 3.25rem;
-    position: relative;
-    overflow: hidden;
-    min-height: 100vh;
-    z-index: 2;
-    box-shadow: 4px 0 40px rgba(0,0,0,0.06);
-  }
-
-  .su-form-panel::before {
-    content: '';
-    position: absolute;
-    top: -80px; right: -80px;
-    width: 260px; height: 260px;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(255,45,107,0.06) 0%, transparent 70%);
-    pointer-events: none;
-  }
-  .su-form-panel::after {
-    content: '';
-    position: absolute;
-    bottom: -60px; left: -60px;
-    width: 200px; height: 200px;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(255,229,100,0.09) 0%, transparent 70%);
-    pointer-events: none;
-  }
-
-  .brand-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    background: #fff0f4;
-    border: 1.5px solid #ffd0de;
-    border-radius: 100px;
-    padding: 5px 14px 5px 6px;
-    width: fit-content;
-    margin-bottom: 1.5rem;
-    animation: fadeUp 0.45s 0.05s both;
-  }
-  .brand-icon {
-    width: 28px; height: 28px;
-    background: #ff2d6b;
-    border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 11px; font-weight: 800; color: #fff;
-  }
-  .brand-name {
-    font-size: 12px; font-weight: 700;
-    color: #ff2d6b; letter-spacing: 0.08em; text-transform: uppercase;
-  }
-
-  .su-title {
-    font-size: 2.4rem;
-    font-weight: 800;
-    color: #111;
-    line-height: 1.15;
-    margin-bottom: 0.5rem;
-    animation: fadeUp 0.45s 0.1s both;
-  }
-  .su-title span {
-    color: #ff2d6b;
-    font-family: 'Instrument Serif', serif;
-    font-style: italic;
-    font-weight: 400;
-  }
-
-  .su-sub {
-    font-size: 14px; color: #bbb; font-weight: 400;
-    margin-bottom: 1.5rem;
-    animation: fadeUp 0.45s 0.15s both;
-  }
-
-  /* perks */
-  .perks-row {
-    display: flex; flex-direction: column; gap: 6px;
-    margin-bottom: 1.75rem;
-    animation: fadeUp 0.45s 0.18s both;
-  }
-  .perk-item {
-    display: flex; align-items: center; gap: 8px;
-    font-size: 12px; color: #999; font-weight: 500;
-  }
-  .perk-icon {
-    color: #ff2d6b; font-size: 8px; flex-shrink: 0;
-  }
-
-  /* fields */
-  .f-group { margin-bottom: 1rem; animation: fadeUp 0.45s both; }
-
-  .f-label {
-    display: block;
-    font-size: 10.5px; font-weight: 700;
-    letter-spacing: 0.09em; text-transform: uppercase;
-    color: #c0c0c0; margin-bottom: 7px;
-  }
-
-  .f-input {
-    width: 100%;
-    padding: 13px 16px;
-    background: #f8f8f8;
-    border: 1.5px solid #efefef;
-    border-radius: 12px;
-    font-family: 'Syne', sans-serif;
-    font-size: 14px; color: #111;
-    outline: none;
-    transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
-  }
-  .f-input::placeholder { color: #d0d0d0; }
-  .f-input:focus {
-    border-color: #ff2d6b;
-    background: #fff;
-    box-shadow: 0 0 0 4px rgba(255,45,107,0.08);
-  }
-
-  .pw-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-
-  .su-btn {
-    width: 100%; padding: 15px;
-    background: #ff2d6b; color: #fff;
-    border: none; border-radius: 12px;
-    font-family: 'Syne', sans-serif;
-    font-size: 15px; font-weight: 700;
-    cursor: pointer; letter-spacing: 0.02em;
-    margin-top: 0.5rem;
-    position: relative; overflow: hidden;
-    transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
-    animation: fadeUp 0.45s 0.42s both;
-  }
-  .su-btn:not(:disabled):hover {
-    background: #e01f59;
-    box-shadow: 0 8px 32px rgba(255,45,107,0.38);
-    transform: translateY(-2px);
-  }
-  .su-btn:not(:disabled):active { transform: scale(0.98); }
-  .su-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .animate-fadeUp       { animation: fadeUp 0.45s both; }
+  .animate-fadeUp-05    { animation: fadeUp 0.45s 0.05s both; }
+  .animate-fadeUp-10    { animation: fadeUp 0.45s 0.1s both; }
+  .animate-fadeUp-15    { animation: fadeUp 0.45s 0.15s both; }
+  .animate-fadeUp-18    { animation: fadeUp 0.45s 0.18s both; }
+  .animate-fadeUp-22    { animation: fadeUp 0.45s 0.22s both; }
+  .animate-fadeUp-27    { animation: fadeUp 0.45s 0.27s both; }
+  .animate-fadeUp-32    { animation: fadeUp 0.45s 0.32s both; }
+  .animate-fadeUp-35    { animation: fadeUp 0.45s 0.35s both; }
+  .animate-fadeUp-42    { animation: fadeUp 0.45s 0.42s both; }
+  .animate-fadeUp-50    { animation: fadeUp 0.45s 0.5s both; }
+  .animate-fadeUp-short { animation: fadeUp 0.3s both; }
 
   .btn-shimmer {
     position: absolute; top: 0; left: -120%;
@@ -202,158 +49,84 @@ const styles = `
     background: linear-gradient(90deg, transparent, rgba(255,255,255,0.22), transparent);
     animation: shimmer 1.5s infinite;
   }
-  @keyframes shimmer { to { left: 200%; } }
 
-  .su-msg {
-    margin-top: 0.9rem; padding: 11px 16px;
-    border-radius: 10px; font-size: 13px; font-weight: 500;
-    text-align: center; animation: fadeUp 0.3s both;
+  .img-slide-active img { animation: slowZoom 8s ease-out forwards; }
+
+  .font-syne       { font-family: 'Syne', sans-serif; }
+  .font-instrument { font-family: 'Instrument Serif', serif; }
+
+  /* Pseudo-element blobs on form panel */
+  .su-form-panel::before {
+    content: '';
+    position: absolute; top: -80px; right: -80px;
+    width: 260px; height: 260px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,45,107,0.06) 0%, transparent 70%);
+    pointer-events: none;
   }
-  .su-msg.ok  { background: #edfaf4; border: 1.5px solid #a3e6c0; color: #1a7f4b; }
-  .su-msg.err { background: #fff0f4; border: 1.5px solid #ffc5d3; color: #c01f45; }
-
-  .su-footer-row {
-    margin-top: 1.4rem; text-align: center;
-    font-size: 13.5px; color: #bbb;
-    animation: fadeUp 0.45s 0.5s both;
-  }
-  .su-footer-row a { color: #ff2d6b; font-weight: 700; text-decoration: none; }
-  .su-footer-row a:hover { text-decoration: underline; }
-
-  /* ── RIGHT — IMAGE SLIDESHOW ── */
-  .su-img-panel {
-    position: relative;
-    overflow: hidden;
-    background: #111;
-  }
-
-  .img-slideshow { position: absolute; inset: 0; }
-
-  .img-slide {
-    position: absolute; inset: 0;
-    opacity: 0;
-    transition: opacity 1s ease;
-  }
-  .img-slide.active { opacity: 1; }
-
-  .img-slide img {
-    width: 100%; height: 100%;
-    object-fit: cover; display: block;
-    transform: scale(1.05);
-    animation: slowZoom 8s ease-out forwards;
-  }
-  @keyframes slowZoom {
-    from { transform: scale(1.05); }
-    to   { transform: scale(1.0); }
-  }
-
-  .img-overlay {
-    position: absolute; inset: 0;
-    background: linear-gradient(
-      135deg,
-      rgba(255,45,107,0.52) 0%,
-      rgba(20,10,30,0.58) 60%,
-      rgba(0,0,0,0.75) 100%
-    );
-    z-index: 1; pointer-events: none;
-  }
-
-  .img-content {
-    position: absolute; inset: 0;
-    z-index: 2;
-    display: flex; flex-direction: column;
-    justify-content: space-between;
-    padding: 2.5rem;
-    color: #fff;
-  }
-
-  .img-logo {
-    font-size: 1.6rem; font-weight: 800;
-    letter-spacing: -0.02em; color: #fff;
-    text-shadow: 0 2px 12px rgba(0,0,0,0.3);
-  }
-  .img-logo span { color: #ffe566; }
-
-  .img-cat-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    background: rgba(255,255,255,0.12);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255,255,255,0.22);
-    border-radius: 100px;
-    padding: 4px 12px;
-    font-size: 10px; font-weight: 700;
-    letter-spacing: 0.09em; text-transform: uppercase;
-    color: rgba(255,255,255,0.85);
-    margin-bottom: 0.9rem;
-    width: fit-content;
-    transition: all 0.4s;
-  }
-
-  .img-bottom {}
-
-  .img-quote {
-    font-family: 'Instrument Serif', serif;
-    font-style: italic;
-    font-size: 2.1rem;
-    font-weight: 400;
-    line-height: 1.28;
-    margin-bottom: 1.5rem;
-    text-shadow: 0 2px 20px rgba(0,0,0,0.3);
-    transition: all 0.5s;
-  }
-
-  .img-dots { display: flex; gap: 6px; }
-  .img-dot {
-    width: 6px; height: 6px; border-radius: 50%;
-    background: rgba(255,255,255,0.3);
-    transition: background 0.3s, width 0.3s;
-    cursor: pointer;
-  }
-  .img-dot.on { background: #ffe566; width: 20px; border-radius: 3px; }
-
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(14px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-
-  @media (max-width: 860px) {
-    .su-root { grid-template-columns: 1fr; }
-    .su-img-panel { display: none; }
-    .su-form-panel { padding: 2.5rem 1.75rem; }
+  .su-form-panel::after {
+    content: '';
+    position: absolute; bottom: -60px; left: -60px;
+    width: 200px; height: 200px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,229,100,0.09) 0%, transparent 70%);
+    pointer-events: none;
   }
 `;
+
+// Shared input class
+const inputCls = "w-full px-4 py-[13px] bg-[#f8f8f8] border-[1.5px] border-[#efefef] rounded-xl font-syne text-sm text-[#111] outline-none transition-all duration-200 placeholder-[#d0d0d0] focus:border-[#ff2d6b] focus:bg-white focus:shadow-[0_0_0_4px_rgba(255,45,107,0.08)]";
 
 function ImagePanel() {
   const [active, setActive] = useState(0);
 
   useEffect(() => {
-    const id = setInterval(() => setActive(p => (p + 1) % SLIDES.length), 4000);
+    const id = setInterval(() => setActive((p) => (p + 1) % SLIDES.length), 4000);
     return () => clearInterval(id);
   }, []);
 
   return (
-    <div className="su-img-panel">
-      <div className="img-slideshow">
+    <div className="relative overflow-hidden bg-[#111] hidden md:block">
+      {/* Slideshow */}
+      <div className="absolute inset-0">
         {SLIDES.map((s, i) => (
-          <div key={i} className={`img-slide${i === active ? " active" : ""}`}>
-            <img src={s.img} alt={s.tag} key={`${i}-${active === i}`} />
+          <div
+            key={i}
+            className={`absolute inset-0 transition-opacity duration-1000 ${i === active ? "opacity-100 img-slide-active" : "opacity-0"}`}
+          >
+            <img src={s.img} alt={s.tag} key={`${i}-${active === i}`} className="w-full h-full object-cover block scale-105" />
           </div>
         ))}
       </div>
-      <div className="img-overlay" />
-      <div className="img-content">
-        <div className="img-logo">Vyn<span>tra</span></div>
-        <div className="img-bottom">
-          <div className="img-cat-badge">{SLIDES[active].tag}</div>
-          <p className="img-quote">"{SLIDES[active].quote}"</p>
-          <div className="img-dots">
+
+      {/* Overlay */}
+      <div
+        className="absolute inset-0 z-10 pointer-events-none"
+        style={{ background: "linear-gradient(135deg, rgba(255,45,107,0.52) 0%, rgba(20,10,30,0.58) 60%, rgba(0,0,0,0.75) 100%)" }}
+      />
+
+      {/* Content */}
+      <div className="absolute inset-0 z-20 flex flex-col justify-between p-10 text-white">
+        {/* Logo */}
+        <div className="text-[1.6rem] font-extrabold tracking-tight font-syne" style={{ textShadow: "0 2px 12px rgba(0,0,0,0.3)" }}>
+          Vyn<span className="text-[#ffe566]">tra</span>
+        </div>
+
+        {/* Bottom */}
+        <div>
+          <div className="inline-flex items-center gap-1.5 bg-white/[0.12] backdrop-blur-[10px] border border-white/[0.22] rounded-full px-3 py-1 text-[10px] font-bold tracking-[0.09em] uppercase text-white/85 mb-[0.9rem] w-fit transition-all duration-[400ms]">
+            {SLIDES[active].tag}
+          </div>
+          <p
+            className="font-instrument italic font-normal text-[2.1rem] leading-[1.28] mb-6"
+            style={{ textShadow: "0 2px 20px rgba(0,0,0,0.3)", transition: "all 0.5s" }}
+          >
+            "{SLIDES[active].quote}"
+          </p>
+          <div className="flex gap-1.5">
             {SLIDES.map((_, i) => (
               <div
                 key={i}
-                className={`img-dot${i === active ? " on" : ""}`}
                 onClick={() => setActive(i)}
+                className={`h-1.5 rounded-full cursor-pointer transition-all duration-300 ${i === active ? "bg-[#ffe566] w-5 rounded-sm" : "bg-white/30 w-1.5"}`}
               />
             ))}
           </div>
@@ -366,8 +139,8 @@ function ImagePanel() {
 function Signup() {
   const BASE = import.meta.env.VITE_DJANGO_BASE_URL;
 
-  const [form, setForm] = useState({ username: "", email: "", password: "", password2: "" });
-  const [msg, setMsg] = useState("");
+  const [form, setForm]       = useState({ username: "", email: "", password: "", password2: "" });
+  const [msg, setMsg]         = useState("");
   const [loading, setLoading] = useState(false);
   const nav = useNavigate();
 
@@ -401,68 +174,108 @@ function Signup() {
 
   return (
     <>
-      <style>{styles}</style>
-      <div className="su-root">
+      <style>{keyframes}</style>
 
-        {/* FORM — LEFT, DOMINANT */}
-        <div className="su-form-panel">
-          <div className="brand-badge">
-            <div className="brand-icon">V</div>
-            <span className="brand-name">Vyntra</span>
+      <div className="min-h-screen grid grid-cols-[520px_1fr] font-syne overflow-hidden bg-white max-md:grid-cols-1">
+
+        {/* ── LEFT — FORM PANEL ── */}
+        <div
+          className="su-form-panel bg-white flex flex-col justify-center px-[3.25rem] py-12 relative overflow-hidden min-h-screen z-[2]"
+          style={{ boxShadow: "4px 0 40px rgba(0,0,0,0.06)" }}
+        >
+          {/* Brand badge */}
+          <div className="animate-fadeUp-05 inline-flex items-center gap-2 bg-[#fff0f4] border-[1.5px] border-[#ffd0de] rounded-full py-[5px] pr-[14px] pl-[6px] w-fit mb-6">
+            <div className="w-7 h-7 bg-[#ff2d6b] rounded-full flex items-center justify-center text-[11px] font-extrabold text-white">
+              V
+            </div>
+            <span className="text-[12px] font-bold text-[#ff2d6b] tracking-[0.08em] uppercase">Vyntra</span>
           </div>
 
-          <h2 className="su-title">
-            Create your<br /><span>free account</span>
+          {/* Title */}
+          <h2 className="animate-fadeUp-10 text-[2.4rem] font-extrabold text-[#111] leading-[1.15] mb-2 font-syne">
+            Create your<br />
+            <span className="text-[#ff2d6b] font-instrument italic font-normal">free account</span>
           </h2>
-          <p className="su-sub">Join millions shopping smarter every day</p>
 
-          <div className="perks-row">
-            {PERKS.map(p => (
-              <div key={p.text} className="perk-item">
-                <span className="perk-icon">{p.icon}</span>
+          <p className="animate-fadeUp-15 text-sm text-[#bbb] font-normal mb-6">
+            Join millions shopping smarter every day
+          </p>
+
+          {/* Perks */}
+          <div className="animate-fadeUp-18 flex flex-col gap-1.5 mb-7">
+            {PERKS.map((p) => (
+              <div key={p.text} className="flex items-center gap-2 text-xs text-[#999] font-medium">
+                <span className="text-[#ff2d6b] text-[8px] flex-shrink-0">{p.icon}</span>
                 {p.text}
               </div>
             ))}
           </div>
 
+          {/* Form */}
           <form onSubmit={handleSubmit}>
-            <div className="f-group" style={{ animationDelay: "0.22s" }}>
-              <label className="f-label">Username</label>
-              <input className="f-input" name="username" onChange={handleChange} value={form.username} placeholder="Choose a username" required />
+            {/* Username */}
+            <div className="animate-fadeUp-22 mb-4">
+              <label className="block text-[10.5px] font-bold tracking-[0.09em] uppercase text-[#c0c0c0] mb-1.5">
+                Username
+              </label>
+              <input className={inputCls} name="username" onChange={handleChange} value={form.username} placeholder="Choose a username" required />
             </div>
 
-            <div className="f-group" style={{ animationDelay: "0.27s" }}>
-              <label className="f-label">Email</label>
-              <input className="f-input" name="email" type="email" onChange={handleChange} value={form.email} placeholder="Enter your email" />
+            {/* Email */}
+            <div className="animate-fadeUp-27 mb-4">
+              <label className="block text-[10.5px] font-bold tracking-[0.09em] uppercase text-[#c0c0c0] mb-1.5">
+                Email
+              </label>
+              <input className={inputCls} name="email" type="email" onChange={handleChange} value={form.email} placeholder="Enter your email" />
             </div>
 
-            <div className="pw-row">
-              <div className="f-group" style={{ animationDelay: "0.32s" }}>
-                <label className="f-label">Password</label>
-                <input className="f-input" name="password" type="password" onChange={handleChange} value={form.password} placeholder="Create" required />
+            {/* Password row */}
+            <div className="grid grid-cols-2 gap-3 mb-0">
+              <div className="animate-fadeUp-32 mb-4">
+                <label className="block text-[10.5px] font-bold tracking-[0.09em] uppercase text-[#c0c0c0] mb-1.5">
+                  Password
+                </label>
+                <input className={inputCls} name="password" type="password" onChange={handleChange} value={form.password} placeholder="Create" required />
               </div>
-              <div className="f-group" style={{ animationDelay: "0.35s" }}>
-                <label className="f-label">Confirm</label>
-                <input className="f-input" name="password2" type="password" onChange={handleChange} value={form.password2} placeholder="Repeat" required />
+              <div className="animate-fadeUp-35 mb-4">
+                <label className="block text-[10.5px] font-bold tracking-[0.09em] uppercase text-[#c0c0c0] mb-1.5">
+                  Confirm
+                </label>
+                <input className={inputCls} name="password2" type="password" onChange={handleChange} value={form.password2} placeholder="Repeat" required />
               </div>
             </div>
 
-            <button type="submit" disabled={loading} className="su-btn">
+            {/* Submit */}
+            <button
+              type="submit"
+              disabled={loading}
+              className="animate-fadeUp-42 w-full py-[15px] bg-[#ff2d6b] text-white border-none rounded-xl font-syne text-[15px] font-bold cursor-pointer tracking-[0.02em] mt-2 relative overflow-hidden transition-all duration-200 hover:enabled:bg-[#e01f59] hover:enabled:shadow-[0_8px_32px_rgba(255,45,107,0.38)] hover:enabled:-translate-y-0.5 active:enabled:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+            >
               {loading && <span className="btn-shimmer" />}
               {loading ? "Creating Account..." : "Create Account →"}
             </button>
           </form>
 
-          {msg && <div className={`su-msg ${isSuccess ? "ok" : "err"}`}>{msg}</div>}
+          {/* Message */}
+          {msg && (
+            <div className={`animate-fadeUp-short mt-[0.9rem] px-4 py-[11px] rounded-[10px] text-[13px] font-medium text-center border-[1.5px] ${
+              isSuccess ? "bg-[#edfaf4] border-[#a3e6c0] text-[#1a7f4b]" : "bg-[#fff0f4] border-[#ffc5d3] text-[#c01f45]"
+            }`}>
+              {msg}
+            </div>
+          )}
 
-          <div className="su-footer-row">
-            Already have an account? <Link to="/login">Sign in</Link>
+          {/* Footer */}
+          <div className="animate-fadeUp-50 mt-[1.4rem] text-center text-[13.5px] text-[#bbb]">
+            Already have an account?{" "}
+            <Link to="/login" className="text-[#ff2d6b] font-bold no-underline hover:underline">
+              Sign in
+            </Link>
           </div>
         </div>
 
-        {/* IMAGE — RIGHT, SUPPORTING */}
+        {/* ── RIGHT — IMAGE PANEL ── */}
         <ImagePanel />
-
       </div>
     </>
   );
