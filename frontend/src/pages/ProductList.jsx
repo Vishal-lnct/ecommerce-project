@@ -265,6 +265,76 @@ function ProductList() {
   else if (category) { heroTitle = ""; heroTitleEm = category.charAt(0).toUpperCase() + category.slice(1); }
   else               { heroTitle = "Explore ";     heroTitleEm = "Everything"; }
 
+
+  // ─────────────────────────────────────────
+// FILTER + SORT LOGIC
+// ADD THIS BEFORE return (
+// ─────────────────────────────────────────
+
+let filteredProducts = [...products];
+
+// PRICE FILTER
+filteredProducts = filteredProducts.filter((product) => {
+
+  if (activePrice === "lt1k") {
+    return product.price < 1000;
+  }
+
+  if (activePrice === "1k5k") {
+    return product.price >= 1000 && product.price <= 5000;
+  }
+
+  if (activePrice === "5k15k") {
+    return product.price >= 5000 && product.price <= 15000;
+  }
+
+  if (activePrice === "gt15k") {
+    return product.price > 15000;
+  }
+
+  return true;
+});
+
+// RATING FILTER
+// RATING FILTER
+filteredProducts = filteredProducts.filter((product) => {
+
+  const rating = Number(product.rating || 0);
+
+  if (activeRating === "5") {
+    return rating >= 5;
+  }
+
+  if (activeRating === "4") {
+    return rating >= 4;
+  }
+
+  if (activeRating === "3") {
+    return rating >= 3;
+  }
+
+  return true;
+});
+
+// SORTING
+if (sort === "price_asc") {
+  filteredProducts.sort((a, b) => a.price - b.price);
+}
+
+if (sort === "price_desc") {
+  filteredProducts.sort((a, b) => b.price - a.price);
+}
+
+if (sort === "rating") {
+  filteredProducts.sort((a, b) => b.rating - a.rating);
+}
+
+if (sort === "newest") {
+  filteredProducts.sort(
+    (a, b) => new Date(b.created_at) - new Date(a.created_at)
+  );
+}
+
   return (
     <>
       <style>{keyframes}</style>
@@ -330,7 +400,7 @@ function ProductList() {
               {!loading && (
                 <>
                   <span className="text-[13px] font-semibold text-white/50">
-                    <strong className="text-white text-[15px]">{products.length}</strong> products found
+                    <strong className="text-white text-[15px]">{filteredProducts.length}</strong> products found
                   </span>
                   <span className="w-px h-5 bg-white/15" />
                 </>
@@ -414,23 +484,38 @@ function ProductList() {
             />
 
             <div className="flex-1 min-w-0">
-              {loading ? (
-                <Skeleton />
-              ) : products.length > 0 ? (
-                <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-6 animate-grid-in">
-                  {products.map((product) => (
-                    <ProductCard key={product.id} product={product} />
-                  ))}
-                </div>
-              ) : (
-                <div className="flex flex-col items-center justify-center py-24 px-8 text-center">
-                  <div className="text-[3.5rem] mb-4">🛍️</div>
-                  <p className="text-[1.2rem] font-bold text-[#999] mb-1">No products found</p>
-                  <p className="text-[13px] text-[#ccc] leading-relaxed">
-                    Try adjusting your filters<br />or search for something else
-                  </p>
-                </div>
-              )}
+   {loading ? (
+  <Skeleton />
+) : filteredProducts.length > 0 ? (
+
+  <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-6 animate-grid-in">
+    {filteredProducts.map((product) => (
+      <ProductCard
+        key={product.id}
+        product={product}
+      />
+    ))}
+  </div>
+
+) : (
+
+  <div className="flex flex-col items-center justify-center py-24 px-8 text-center">
+    <div className="text-[3.5rem] mb-4">🛍️</div>
+
+    <p className="text-[1.2rem] font-bold text-[#999] mb-1">
+      No products found
+    </p>
+
+    <p className="text-[13px] text-[#ccc] leading-relaxed">
+      Try adjusting your filters
+      <br />
+      or search for something else
+    </p>
+  </div>
+
+)}
+
+               
             </div>
           </div>
         )}

@@ -104,6 +104,7 @@ function Navbar() {
           {/* LOGO */}
           <NavLink
             to="/"
+  onClick={() => window.location.href = "/"}
             className="text-[1.45rem] font-extrabold text-[#ff2d6b] no-underline tracking-[-0.03em] flex-shrink-0 transition-opacity duration-200 hover:opacity-80"
           >
             Vyn<span className="text-[#111]">tra</span>
